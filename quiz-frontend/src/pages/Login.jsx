@@ -17,7 +17,7 @@ function Login() {
     } catch (err) {
       alert('Invalid credentials');
     }
-  };
+  };  
 
   return (
     <div className='login'>
