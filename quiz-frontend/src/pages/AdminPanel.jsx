@@ -2,25 +2,27 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 function AdminPanel() {
-  const [quizzes, setQuizzes] = useState([]);
+  const [course, setCourse] = useState([]);
   const [quizzesId, getQuizzes] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [quizId, setQuizId] = useState(null);
   const [newQuestion, setNewQuestion] = useState({});
 
-  const [newQuiz, setNewQuiz] = useState({
+  const [selectedCourseId, setSelectedCourseId] = useState(null);
+  const [newTopic, setNewTopic] = useState("");
+
+  const [newCourse, setNewCourse] = useState({
     title: "",
-    // time_limit: "",
   });
 
   const token = localStorage.getItem("token");
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/quizzes", {
+      .get("http://localhost:5000/api/course", {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setQuizzes(res.data));
+      .then((res) => setCourse(res.data));
   }, []);
 
   const loadQuestions = async (id) => {
@@ -41,13 +43,13 @@ function AdminPanel() {
 
   //   setQuizzes(res.data);
   // };
-  const addQuiz = async () => {
+  const addCourse = async () => {
     // Trim and normalize title
-    const trimmedTitle = newQuiz.title.trim().toLowerCase();
+    const trimmedTitle = newCourse.title.trim().toLowerCase();
 
     // Check if title already exists
-    const isDuplicate = quizzes.some(
-      (quiz) => quiz.title.trim().toLowerCase() === trimmedTitle
+    const isDuplicate = course.some(
+      (course) => course.title.trim().toLowerCase() === trimmedTitle
     );
 
     if (isDuplicate) {
@@ -56,31 +58,47 @@ function AdminPanel() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/quizzes", newQuiz, {
+      await axios.post("http://localhost:5000/api/course", newCourse, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const res = await axios.get("http://localhost:5000/api/quizzes", {
+      const res = await axios.get("http://localhost:5000/api/course", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      setNewQuiz({ title: "", time_limit: "" }); // Clear form
-      setQuizzes(res.data);
+      setNewCourse({ title: "" }); // Clear form
+      setCourse(res.data);
     } catch (err) {
       console.error("Error adding quiz:", err);
       alert("Failed to add quiz. Try again.");
     }
   };
 
+  const addTopic = async () => {
+    if (!newTopic.trim()) return;
+    try {
+      await axios.post(
+        `http://localhost:5000/api/course/${selectedCourseId}/topics`,
+        { description: newTopic },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setNewTopic("");
+      setSelectedCourseId(null);
+      // Optionally reload courses/topics here
+    } catch (err) {
+      alert("Failed to add topic");
+    }
+  };
+
   const deleteTopic = async (id) => {
-    await axios.delete(`http://localhost:5000/api/quizzes/${id}`, {
+    await axios.delete(`http://localhost:5000/api/course/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    const res = await axios.get("http://localhost:5000/api/quizzes", {
+    const res = await axios.get("http://localhost:5000/api/course", {
       headers: { Authorization: `Bearer ${token}` },
     });
-    setQuizzes(res.data);
+    setCourse(res.data);
   };
 
   const addQuestion = async () => {
@@ -129,8 +147,10 @@ function AdminPanel() {
           <input
             className="border p-2 rounded w-full"
             placeholder="Course"
-            value={newQuiz.title}
-            onChange={(e) => setNewQuiz({ ...newQuiz, title: e.target.value })}
+            value={newCourse.title}
+            onChange={(e) =>
+              setNewCourse({ ...newCourse, title: e.target.value })
+            }
           />
           {/* <input
             className="border p-2 rounded w-full"
@@ -142,7 +162,7 @@ function AdminPanel() {
 
           <button
             className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-            onClick={addQuiz}
+            onClick={addCourse}
           >
             Add
           </button>
@@ -150,7 +170,7 @@ function AdminPanel() {
       </div>
 
       <div className="grid md:grid-cols-3 gap-4 mb-8">
-        {quizzes.map((q) => (
+        {course.map((q) => (
           <div
             key={q.id}
             className=" bg-white p-4 rounded shadow hover:bg-indigo-100 transition"
@@ -158,8 +178,8 @@ function AdminPanel() {
             <h3 className="font-semibold text-xl">{q.title}</h3>
             <div className="flex justify-between mt-4">
               <button
+                onClick={() => setSelectedCourseId(q.id)}
                 className="rounded rounded-md text-white cursor-pointer bg-sky-500 p-2"
-                onClick={() => loadQuestions(q.id)}
               >
                 Add Topics
               </button>
@@ -187,18 +207,18 @@ function AdminPanel() {
           <button
             className="btn bg-purple-400 p-2"
             onClick={(e) =>
-              setNewQuiz({ ...newQuiz, description: e.target.value })
+              setNewCourse({ ...newCourse, description: e.target.value })
             }
           >
             Add Topic
           </button>
-          {quizzes.map}
+          {course.map}
         </div>
       </div>
 
       {quizId && (
         <div className="bg-white rounded p-6 shadow">
-          <h3 className="text-xl font-semibold mb-4">Questions List </h3>
+          <h3 className="text-xl font-semibold mb-4">Questions List</h3>
           <div className="space-y-3">
             {questions.map((q) => (
               <div key={q.id} className="p-3 border rounded">
