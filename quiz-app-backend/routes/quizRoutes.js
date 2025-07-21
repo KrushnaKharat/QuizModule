@@ -9,6 +9,6 @@ const { authMiddleware } = require("../middleware/authMiddleware");
 
 router.get("/", authMiddleware, getAllQuizzes);
 router.post("/", authMiddleware, createQuiz);
-router.post("/:id", authMiddleware, deleteTopic);
+router.delete("/:id", authMiddleware, deleteTopic);
 
 module.exports = router;
