@@ -4,13 +4,15 @@ const app = express();
 const authRoutes = require("./routes/authRoutes");
 const quizRoutes = require("./routes/quizRoutes");
 const questionRoutes = require("./routes/questionRoutes");
+const topicRoutes = require("./routes/topicRoutes");
 
 app.use(cors());
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
-app.use("/api/course", quizRoutes);
+app.use("/api/courses", quizRoutes);
 app.use("/api/questions", questionRoutes);
+app.use("/api/course", topicRoutes);
 
 app.listen(5000, () => {
   console.log("🚀 Server running on port 5000");
