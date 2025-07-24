@@ -10,7 +10,7 @@ function AdminPanel() {
 
   const [newQuiz, setNewQuiz] = useState({
     title: "",
-    // time_limit: "",
+  
   });
 
   const token = localStorage.getItem("token");
