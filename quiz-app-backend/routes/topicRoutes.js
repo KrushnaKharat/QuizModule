@@ -1,18 +1,16 @@
-// In your routes file
 const express = require("express");
 const router = express.Router();
-
-const topicController = require("../controllers/topicController");
+const {
+  getAllTopics,
+  addTopic,
+  updateTopic,
+  deleteTopic,
+} = require("../controllers/topicController");
 const { authMiddleware } = require("../middleware/authMiddleware");
-router.get(
-  "/course/:courseId/topics",
-  authMiddleware,
-  topicController.getAllTopics
-);
-router.post(
-  "/course/:courseId/topics",
-  authMiddleware,
-  topicController.addTopicToCourse
-);
+
+router.get("/:courseId/topics", authMiddleware, getAllTopics);
+router.post("/:courseId/topics", authMiddleware, addTopic);
+router.put("/:courseId/topics/:topicId", authMiddleware, updateTopic);
+router.delete("/:courseId/topics/:topicId", authMiddleware, deleteTopic);
 
 module.exports = router;
