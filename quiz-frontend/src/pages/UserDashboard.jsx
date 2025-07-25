@@ -13,9 +13,11 @@ function UserDashboard() {
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
+
         const token = localStorage.getItem("token");
         const res = await axios.get("http://localhost:5000/api/courses", {
           headers: { Authorization: `Bearer ${token}` },
+
         });
         setQuizzes(res.data);
       } catch (err) {
@@ -54,6 +56,9 @@ function UserDashboard() {
     localStorage.clear();
     navigate("/");
   };
+
+  // Emoji array for unique icons
+  const quizEmojis = ['🧠', '📘', '🎲', '🎯', '📝', '📚', '💡', '🚀', '🔬', '🎵'];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white p-6">
@@ -113,17 +118,16 @@ function UserDashboard() {
               onClick={() => handleCourseClick(quiz)}
               className="group cursor-pointer bg-white rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.03] transform transition duration-300 p-6"
               style={{
-                animationDelay: `${index * 100}ms`,
-                animationFillMode: "both",
+
+                animation: 'fadeInUp 0.7s cubic-bezier(.21,.61,.35,1) forwards',
+                animationDelay: `${index * 120}ms`,
+                opacity: 0
               }}
             >
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-indigo-700">
-                  {quiz.title}
-                </h2>
-                <span className="text-3xl">
-                  {index % 2 === 0 ? "🧠" : "📘"}
-                </span>
+                <h2 className="text-xl font-bold text-indigo-700">{quiz.title}</h2>
+                <span className="text-3xl">{quizEmojis[index % quizEmojis.length]}</span>
+
               </div>
               <div className="mt-4 text-sm text-indigo-600 font-medium underline opacity-0 group-hover:opacity-100 transition">
                 View Topics →
