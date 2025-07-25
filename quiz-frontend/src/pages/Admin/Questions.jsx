@@ -51,20 +51,20 @@ function Questions({ topicId, token, onBack }) {
   };
 
   return (
-    <div className="bg-white rounded shadow p-6">
+    <div className="bg-white rounded shadow p-6 gap-2">
       <button className="mb-4 text-blue-600 underline" onClick={onBack}>
         &larr; Back to Topics
       </button>
       <h3 className="text-xl font-semibold mb-4">Questions</h3>
+      <input
+        className="border p-2 rounded w-full"
+        placeholder="Question text"
+        value={newQuestion.question_text}
+        onChange={(e) =>
+          setNewQuestion({ ...newQuestion, question_text: e.target.value })
+        }
+      />
       <div className="mb-4 grid md:grid-cols-2 gap-2">
-        <input
-          className="border p-2 rounded"
-          placeholder="Question text"
-          value={newQuestion.question_text}
-          onChange={(e) =>
-            setNewQuestion({ ...newQuestion, question_text: e.target.value })
-          }
-        />
         <input
           className="border p-2 rounded"
           placeholder="Option A"
@@ -105,13 +105,13 @@ function Questions({ topicId, token, onBack }) {
             setNewQuestion({ ...newQuestion, correct_option: e.target.value })
           }
         />
-        <button
-          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-          onClick={handleAddQuestion}
-        >
-          Add Question
-        </button>
       </div>
+      <button
+        className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+        onClick={handleAddQuestion}
+      >
+        Add Question
+      </button>
       <div>
         <h4 className="font-semibold mb-2">Questions List</h4>
         {questions.length === 0 ? (
