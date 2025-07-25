@@ -1,10 +1,10 @@
 const db = require("../config/db");
 
-exports.getQuestionsByQuizId = (req, res) => {
-  const { quizId } = req.params;
+exports.getQuestionsByTopicId = (req, res) => {
+  const { topicId } = req.params;
   db.query(
-    "SELECT * FROM questions WHERE quiz_id = ?",
-    [quizId],
+    "SELECT * FROM questions WHERE topic_id = ?",
+    [topicId],
     (err, results) => {
       if (err) return res.status(500).json(err);
       res.json(results);
@@ -12,21 +12,33 @@ exports.getQuestionsByQuizId = (req, res) => {
   );
 };
 
-exports.addQuestion = (req, res) => {
-  const data = req.body;
-  db.query("INSERT INTO questions SET ?", data, (err) => {
-    if (err) return res.status(500).json(err);
-    res.json({ msg: "Question added" });
-  });
-};
+exports.addQuestionToTopic = (req, res) => {
+  const { topicId } = req.params;
+  const {
+    question_text,
+    option_a,
+    option_b,
+    option_c,
+    option_d,
+    correct_option,
+  } = req.body;
 
-exports.updateQuestion = (req, res) => {
-  const { id } = req.params;
-  const data = req.body;
-  db.query("UPDATE questions SET ? WHERE id = ?", [data, id], (err) => {
-    if (err) return res.status(500).json(err);
-    res.json({ msg: "Question updated" });
-  });
+  db.query(
+    "INSERT INTO questions (topic_id, question_text, option_a, option_b, option_c, option_d, correct_option) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    [
+      topicId,
+      question_text,
+      option_a,
+      option_b,
+      option_c,
+      option_d,
+      correct_option,
+    ],
+    (err) => {
+      if (err) return res.status(500).json(err);
+      res.json({ msg: "Question added" });
+    }
+  );
 };
 
 exports.deleteQuestion = (req, res) => {
