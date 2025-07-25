@@ -96,7 +96,7 @@ function Topics({ courseId, onBack, token, onAddQuestions }) {
         topics.map((topic) => (
           <div
             key={topic.id}
-            className="flex items-center justify-between mb-2"
+            className="flex items-center justify-between mb-2 "
           >
             {editTopicId === topic.id ? (
               <>
@@ -106,7 +106,7 @@ function Topics({ courseId, onBack, token, onAddQuestions }) {
                   onChange={(e) => setEditTopicTitle(e.target.value)}
                 />
                 <button
-                  className="bg-green-500 text-white px-2 py-1 rounded ml-2"
+                  className="bg-orange-400 text-white px-2 py-1 rounded ml-2"
                   onClick={() => handleEditTopic(topic.id)}
                 >
                   Save
@@ -119,36 +119,112 @@ function Topics({ courseId, onBack, token, onAddQuestions }) {
                 </button>
               </>
             ) : (
-              <>
-                <div className=" flex w-full ">
-                  <p>{topic.title} </p>
-                  <div className="flex w-full ">
+              <div className="flex w-1/2 justify-between gap-2">
+                <div className="flex w-full justify-between gap-2 text-center ">
+                  <p className="align-middle justify-center content-center text-xl">
+                    {topic.title}{" "}
+                  </p>
+                  <div className="flex justify-end">
                     <button
-                      className="bg-blue-500 text-white px-2 py-1 rounded mr-2"
+                      className=" text-black px-2 py-1 rounded mr-2 border hover:bg-gray-300"
                       onClick={() => {
                         setEditTopicId(topic.id);
                         setEditTopicTitle(topic.title);
                       }}
                     >
-                      Rename
+                      <svg
+                        width="30px"
+                        height="30px"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        className=" rounded-full "
+                      >
+                        <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                        <g
+                          id="SVGRepo_tracerCarrier"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        ></g>
+                        <g id="SVGRepo_iconCarrier">
+                          {" "}
+                          <path
+                            fillRule="evenodd"
+                            clipRule="evenodd"
+                            d="M8.56078 20.2501L20.5608 8.25011L15.7501 3.43945L3.75012 15.4395V20.2501H8.56078ZM15.7501 5.56077L18.4395 8.25011L16.5001 10.1895L13.8108 7.50013L15.7501 5.56077ZM12.7501 8.56079L15.4395 11.2501L7.93946 18.7501H5.25012L5.25012 16.0608L12.7501 8.56079Z"
+                            fill="#030303"
+                          ></path>{" "}
+                        </g>
+                      </svg>
                     </button>
                     <button
-                      className="bg-red-500 text-white px-2 py-1 rounded"
+                      className="  px-2 py-1 rounded border hover:bg-red-200"
                       onClick={() => handleDeleteTopic(topic.id)}
                     >
-                      Delete Topic
+                      <svg
+                        width="30px"
+                        height="30px"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+                        <g
+                          id="SVGRepo_tracerCarrier"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        ></g>
+                        <g id="SVGRepo_iconCarrier">
+                          {" "}
+                          <path
+                            d="M10 11V17"
+                            stroke="#ff0000"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          ></path>{" "}
+                          <path
+                            d="M14 11V17"
+                            stroke="#ff0000"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          ></path>{" "}
+                          <path
+                            d="M4 7H20"
+                            stroke="#ff0000"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          ></path>{" "}
+                          <path
+                            d="M6 7H12H18V18C18 19.6569 16.6569 21 15 21H9C7.34315 21 6 19.6569 6 18V7Z"
+                            stroke="#ff0000"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          ></path>{" "}
+                          <path
+                            d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z"
+                            stroke="#ff0000"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          ></path>{" "}
+                        </g>
+                      </svg>
                     </button>
                   </div>
                 </div>
-                <div>
+                <div className=" ">
                   <button
-                    className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
+                    className="bg-green-600 text-white  px-2 py-1 rounded mr-2"
                     onClick={() => onAddQuestions(topic.id)}
                   >
                     Add Questions
                   </button>
                 </div>
-              </>
+              </div>
             )}
           </div>
         ))

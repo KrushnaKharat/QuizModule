@@ -104,33 +104,6 @@ function Courses({ onEditTopics }) {
     }
   };
 
-  const handleEditTopic = async (topicId) => {
-    try {
-      await axios.put(
-        `http://localhost:5000/api/course/${viewTopicsCourseId}/topics/${topicId}`,
-        { title: editTopicTitle },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchTopics(viewTopicsCourseId);
-      setEditTopicId(null);
-      setEditTopicTitle("");
-    } catch (err) {
-      alert("Failed to edit topic");
-    }
-  };
-
-  const handleDeleteTopic = async (topicId) => {
-    try {
-      await axios.delete(
-        `http://localhost:5000/api/course/${viewTopicsCourseId}/topics/${topicId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchTopics(viewTopicsCourseId);
-    } catch (err) {
-      alert("Failed to delete topic");
-    }
-  };
-
   const deleteTopic = async (id) => {
     await axios.delete(`http://localhost:5000/api/courses/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -213,7 +186,7 @@ function Courses({ onEditTopics }) {
                   className="rounded rounded-md text-white cursor-pointer bg-sky-500 p-2"
                   onClick={() => onEditTopics(q.id)}
                 >
-                  Edit Topics
+                  View Topics
                 </button>
                 <button
                   className="btn text-white bg-red-500 cursor-pointer rounded rounded-md p-2 "
@@ -245,162 +218,10 @@ function Courses({ onEditTopics }) {
                   </button>
                 </div>
               )}
-              {/* Topics List */}
-              {/* {viewTopicsCourseId === q.id && (
-                <div className="bg-gray-50 rounded p-4 mt-4 w-full">
-                  <h4 className="font-semibold mb-2">Topics</h4>
-                  {topics.length === 0 ? (
-                    <div className="text-gray-500">No topics found.</div>
-                  ) : (
-                    topics.map((topic) => (
-                      <div
-                        key={topic.id}
-                        className="flex items-center justify-between mb-2"
-                      >
-                        {editTopicId === topic.id ? (
-                          <>
-                            <input
-                              className="border p-1 rounded"
-                              value={editTopicTitle}
-                              onChange={(e) =>
-                                setEditTopicTitle(e.target.value)
-                              }
-                            />
-                            <button
-                              className="bg-green-500 text-white px-2 py-1 rounded ml-2"
-                              onClick={() => handleEditTopic(topic.id)}
-                            >
-                              Save
-                            </button>
-                            <button
-                              className="bg-gray-400 text-white px-2 py-1 rounded ml-2"
-                              onClick={() => setEditTopicId(null)}
-                            >
-                              Cancel
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <span>{topic.title}</span>
-                            <div>
-                              <button
-                                className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
-                                onClick={() => {
-                                  setEditTopicId(topic.id);
-                                  setEditTopicTitle(topic.title);
-                                }}
-                              >
-                                Edit
-                              </button>
-                              <button
-                                className="bg-red-500 text-white px-2 py-1 rounded"
-                                onClick={() => handleDeleteTopic(topic.id)}
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-              )} */}
             </div>
           </div>
         ))}
       </div>
-
-      {/* {quizId && (
-        <div className="bg-white rounded p-6 shadow">
-          <h3 className="text-xl font-semibold mb-4">Questions List</h3>
-          <div className="space-y-3">
-            {questions.map((q) => (
-              <div key={q.id} className="p-3 border rounded">
-                <input
-                  defaultValue={q.question_text}
-                  onChange={(e) => (q.question_text = e.target.value)}
-                  className="border w-full p-2 mb-2 rounded"
-                />
-                <div className="flex justify-between">
-                  <button
-                    onClick={() => updateQuestion(q)}
-                    className="bg-green-500 text-white px-3 py-1 rounded"
-                  >
-                    Update
-                  </button>
-                  <button
-                    onClick={() => deleteQuestion(q.id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6">
-            <h4 className="font-semibold mb-2">Add New Question</h4>
-            <div className="grid md:grid-cols-2 gap-4">
-              <input
-                className="border p-2 rounded"
-                placeholder="Question text"
-                onChange={(e) =>
-                  setNewQuestion({
-                    ...newQuestion,
-                    question_text: e.target.value,
-                  })
-                }
-              />
-              <input
-                className="border p-2 rounded"
-                placeholder="Option A"
-                onChange={(e) =>
-                  setNewQuestion({ ...newQuestion, option_a: e.target.value })
-                }
-              />
-              <input
-                className="border p-2 rounded"
-                placeholder="Option B"
-                onChange={(e) =>
-                  setNewQuestion({ ...newQuestion, option_b: e.target.value })
-                }
-              />
-              <input
-                className="border p-2 rounded"
-                placeholder="Option C"
-                onChange={(e) =>
-                  setNewQuestion({ ...newQuestion, option_c: e.target.value })
-                }
-              />
-              <input
-                className="border p-2 rounded"
-                placeholder="Option D"
-                onChange={(e) =>
-                  setNewQuestion({ ...newQuestion, option_d: e.target.value })
-                }
-              />
-              <input
-                className="border p-2 rounded"
-                placeholder="Correct Option (A/B/C/D)"
-                onChange={(e) =>
-                  setNewQuestion({
-                    ...newQuestion,
-                    correct_option: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <button
-              className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-              onClick={addQuestion}
-            >
-              Add Question
-            </button>
-          </div>
-        </div>
-      )} */}
     </div>
   );
 }
