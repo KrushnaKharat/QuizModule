@@ -1,16 +1,33 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Users from "./Users";
-import Courses from "./Courses";
+import Courses from "./Admin/Courses";
+import Topics from "./Admin/Topics"; // import Topics
+import Questions from "./Admin/Questions";
 
 function AdminPanel() {
   const [showUsers, setShowUsers] = useState(false);
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
+  const [showTopics, setShowTopics] = useState(false);
+  const [topicsCourseId, setTopicsCourseId] = useState(null);
   const token = localStorage.getItem("token");
 
+  const [showQuestions, setShowQuestions] = useState(false);
+  const [questionsTopicId, setQuestionsTopicId] = useState(null);
+
+  const handleAddQuestions = (topicId) => {
+    setQuestionsTopicId(topicId);
+    setShowQuestions(true);
+  };
+
+  // Handler to go back to Topics
+  const handleBackToTopics = () => {
+    setShowQuestions(false);
+    setQuestionsTopicId(null);
+  };
+
   useEffect(() => {
-    // Fetch logged-in user details from backend
     axios
       .get("http://localhost:5000/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
@@ -25,6 +42,18 @@ function AdminPanel() {
       });
   }, [token]);
 
+  // Handler to open Topics
+  const handleEditTopics = (courseId) => {
+    setTopicsCourseId(courseId);
+    setShowTopics(true);
+  };
+
+  // Handler to go back to Courses
+  const handleBackToCourses = () => {
+    setShowTopics(false);
+    setTopicsCourseId(null);
+  };
+
   return (
     <div className="min-h-screen w-full flex bg-gray-50 overflow-hidden">
       <div className="w-1/5 bg-gray-500 flex flex-col p-4 gap-12 text-white align-middle text-lg">
@@ -33,17 +62,55 @@ function AdminPanel() {
           <p className="text-sm mt-2">{userEmail}</p>
         </div>
         <div className="flex flex-col text-center">
-          <a href="#" className="p-4" onClick={() => setShowUsers(false)}>
+          <a
+            href="#"
+            className="p-4"
+            onClick={() => {
+              setShowUsers(false);
+              setShowTopics(false);
+            }}
+          >
             Home
           </a>
-          <a href="#" className="p-4" onClick={() => setShowUsers(false)}>
+          <a
+            href="#"
+            className="p-4"
+            onClick={() => {
+              setShowUsers(false);
+              setShowTopics(false);
+            }}
+          >
             Courses
           </a>
-          <a href="#" className="p-4" onClick={() => setShowUsers(true)}>
+          <a
+            href="#"
+            className="p-4"
+            onClick={() => {
+              setShowUsers(true);
+              setShowTopics(false);
+            }}
+          >
             Students
           </a>
-          <a href="#" className="p-4" onClick={() => setShowUsers(false)}>
+          <a
+            href="#"
+            className="p-4"
+            onClick={() => {
+              setShowUsers(false);
+              setShowTopics(false);
+            }}
+          >
             Scores
+          </a>
+          <a
+            href="#"
+            className="p-4"
+            onClick={() => {
+              setShowUsers(false);
+              setShowTopics(false);
+            }}
+          >
+            Add Questions
           </a>
         </div>
       </div>
@@ -60,7 +127,25 @@ function AdminPanel() {
             Logout
           </button>
         </div>
-        {showUsers ? <Users token={token} /> : <Courses />}
+        {/* Main content switch */}
+        {showUsers ? (
+          <Users token={token} />
+        ) : showQuestions && questionsTopicId ? (
+          <Questions
+            topicId={questionsTopicId}
+            token={token}
+            onBack={handleBackToTopics}
+          />
+        ) : showTopics && topicsCourseId ? (
+          <Topics
+            courseId={topicsCourseId}
+            token={token}
+            onBack={handleBackToCourses}
+            onAddQuestions={handleAddQuestions} // pass handler
+          />
+        ) : (
+          <Courses onEditTopics={handleEditTopics} />
+        )}
       </div>
     </div>
   );

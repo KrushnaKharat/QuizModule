@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-function Courses() {
+function Courses({ onEditTopics }) {
   const [course, setCourse] = useState([]);
   const [quizzesId, getQuizzes] = useState([]);
   const [questions, setQuestions] = useState([]);
@@ -40,16 +40,6 @@ function Courses() {
     setQuestions(res.data);
   };
 
-  // const addQuiz = async () => {
-  //   await axios.post("http://localhost:5000/api/quizzes", newQuiz, {
-  //     headers: { Authorization: `Bearer ${token}` },
-  //   });
-  //   const res = await axios.get("http://localhost:5000/api/quizzes", {
-  //     headers: { Authorization: `Bearer ${token}` },
-  //   });
-
-  //   setQuizzes(res.data);
-  // };
   const addCourse = async () => {
     // Trim and normalize title
     const trimmedTitle = newCourse.title.trim().toLowerCase();
@@ -211,21 +201,19 @@ function Courses() {
         {course.map((q) => (
           <div key={q.id} className="bg-white rounded shadow  ">
             <div className="flex hover:bg-indigo-100 justify-between transition w-full p-2 ">
-              <div className="font-semibold text-xl">
-                {q.title}
-                <button
-                  className="block text-sm mt-6 cursor-pointer underline text-purple-700"
-                  onClick={() => fetchTopics(q.id)}
-                >
-                  View Topics
-                </button>
-              </div>
+              <div className="font-semibold text-xl">{q.title}</div>
               <div className="flex flex-col gap-2 justify-between h-full">
-                <button
+                {/* <button
                   onClick={() => setSelectedCourseId(q.id)}
                   className="rounded rounded-md text-white cursor-pointer bg-sky-500 p-2"
                 >
                   Add Topics
+                </button> */}
+                <button
+                  className="rounded rounded-md text-white cursor-pointer bg-sky-500 p-2"
+                  onClick={() => onEditTopics(q.id)}
+                >
+                  Edit Topics
                 </button>
                 <button
                   className="btn text-white bg-red-500 cursor-pointer rounded rounded-md p-2 "
@@ -258,7 +246,7 @@ function Courses() {
                 </div>
               )}
               {/* Topics List */}
-              {viewTopicsCourseId === q.id && (
+              {/* {viewTopicsCourseId === q.id && (
                 <div className="bg-gray-50 rounded p-4 mt-4 w-full">
                   <h4 className="font-semibold mb-2">Topics</h4>
                   {topics.length === 0 ? (
@@ -317,7 +305,7 @@ function Courses() {
                     ))
                   )}
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         ))}
