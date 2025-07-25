@@ -1,7 +1,35 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+// "csv" or "excel"
 
 function Questions({ topicId, token, onBack }) {
+  const [importFile, setImportFile] = useState(null);
+  const [importType, setImportType] = useState("");
+  const handleImport = async () => {
+    if (!importFile || !importType) return;
+    const formData = new FormData();
+    formData.append("file", importFile);
+
+    try {
+      await axios.post(
+        `http://localhost:5000/api/topics/${topicId}/import`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setImportFile(null);
+      setImportType("");
+      fetchQuestions();
+      alert("Questions imported successfully");
+    } catch (err) {
+      alert("Failed to import questions");
+    }
+  };
+
   const [questions, setQuestions] = useState([]);
   const [newQuestion, setNewQuestion] = useState({
     question_text: "",
@@ -111,6 +139,42 @@ function Questions({ topicId, token, onBack }) {
         >
           Add Question
         </button>
+      </div>
+      <div className="mb-4 flex gap-4">
+        <div>
+          <input
+            type="file"
+            accept=".csv"
+            onChange={(e) => {
+              setImportFile(e.target.files[0]);
+              setImportType("csv");
+            }}
+          />
+          <button
+            className="bg-green-600 text-white px-4 py-2 rounded ml-2"
+            onClick={handleImport}
+            disabled={!importFile || importType !== "csv"}
+          >
+            Import CSV
+          </button>
+        </div>
+        <div>
+          <input
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={(e) => {
+              setImportFile(e.target.files[0]);
+              setImportType("excel");
+            }}
+          />
+          <button
+            className="bg-blue-600 text-white px-4 py-2 rounded ml-2"
+            onClick={handleImport}
+            disabled={!importFile || importType !== "excel"}
+          >
+            Import Excel
+          </button>
+        </div>
       </div>
       <div>
         <h4 className="font-semibold mb-2">Questions List</h4>
