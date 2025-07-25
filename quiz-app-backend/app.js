@@ -11,7 +11,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", quizRoutes);
-app.use("/api/questions", questionRoutes);
+app.use("/api", questionRoutes);
 app.use("/api/course", topicRoutes);
 
 app.listen(5000, () => {

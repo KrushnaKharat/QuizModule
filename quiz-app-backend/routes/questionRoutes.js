@@ -1,17 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const {
-  getQuestionsByQuizId,
-  addQuestion,
+  getQuestionsByTopicId,
+  addQuestionToTopic,
   updateQuestion,
   deleteQuestion,
 } = require("../controllers/questionController");
 const { authMiddleware } = require("../middleware/authMiddleware");
 
-router.get("/:quizId", authMiddleware, getQuestionsByQuizId);
-router.post("/", authMiddleware, addQuestion);
+// For topic-based questions
+router.get("/topics/:topicId/questions", authMiddleware, getQuestionsByTopicId);
+router.post("/topics/:topicId/questions", authMiddleware, addQuestionToTopic);
+
+// You can keep or remove this if not needed
 router.put("/:id", authMiddleware, updateQuestion);
 router.delete("/:id", authMiddleware, deleteQuestion);
-router.put("/:id", updateQuestion);
 
 module.exports = router;
