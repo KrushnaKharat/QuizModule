@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import "./QuizPage.css";
 
 function QuizPage() {
@@ -8,13 +8,26 @@ function QuizPage() {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [current, setCurrent] = useState(0);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [score, setScore] = useState(null);
+  const [remainingAttempts, setRemainingAttempts] = useState(null);
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem("token");
+  const isPractice = location.pathname.startsWith("/practicequiz");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    setLoading(true);
+    const endpoint = isPractice
+      ? `http://localhost:5000/api/practice/topics/${quizId}/practicequestions`
+      : `http://localhost:5000/api/topics/${quizId}/questions`;
     axios
-      .get(`http://localhost:5000/api/topics/${quizId}/questions`, {
+      .get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -26,7 +39,22 @@ function QuizPage() {
         setError("Failed to load questions. Please try again later.");
         setLoading(false);
       });
-  }, [quizId]);
+
+    // Fetch remaining attempts for quiz
+    if (!isPractice) {
+      const userId = JSON.parse(localStorage.getItem("user"))?.id;
+      if (userId) {
+        axios
+          .get(
+            `http://localhost:5000/api/attempts/remaining/${userId}/${quizId}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          )
+          .then((res) => setRemainingAttempts(res.data.remaining))
+          .catch(() => setRemainingAttempts(null));
+      }
+    }
+    // eslint-disable-next-line
+  }, [quizId, location.pathname]);
 
   const handleAnswer = (qid, opt) => {
     setAnswers({ ...answers, [qid]: opt });
@@ -44,23 +72,103 @@ function QuizPage() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const isAllAnswered = questions.every((q) => answers[q.id]);
     if (!isAllAnswered) {
       alert("Please answer all questions before submitting.");
       return;
     }
 
-    let score = 0;
-    questions.forEach((q) => {
-      if (answers[q.id] === q.correct_option) score++;
+    let scoreVal = 0;
+    const answerArr = questions.map((q) => {
+      const selected = answers[q.id];
+      const correct = selected === q.correct_option;
+      if (correct) scoreVal++;
+      return {
+        question_id: q.id,
+        selected_option: selected,
+        is_correct: correct,
+      };
     });
-    alert(`You scored ${score}/${questions.length}`);
+
+    setScore(scoreVal);
+
+    if (isPractice) {
+      setSubmitted(true);
+      return;
+    }
+
+    try {
+      await axios.post(
+        "http://localhost:5000/api/attempts/submit",
+        {
+          topicId: quizId,
+          answers: answerArr,
+          score: scoreVal,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSubmitted(true);
+      // Refetch remaining attempts
+      const userId = JSON.parse(localStorage.getItem("user"))?.id;
+      if (userId) {
+        axios
+          .get(
+            `http://localhost:5000/api/attempts/remaining/${userId}/${quizId}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          )
+          .then((res) => setRemainingAttempts(res.data.remaining))
+          .catch(() => {});
+      }
+    } catch (err) {
+      alert(
+        err.response?.data?.msg ||
+          "Failed to submit quiz. Maybe you reached max attempts."
+      );
+      setSubmitted(false);
+      console.log({
+        topicId: quizId,
+        answers: answerArr,
+        score: scoreVal,
+      });
+    }
   };
 
   if (loading) return <div className="text-center p-10">Loading quiz...</div>;
   if (error)
     return <div className="text-center p-10 text-red-500">{error}</div>;
+
+  // Show result after submit
+  if (submitted)
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200">
+        <div className="bg-white shadow-lg px-8 py-10 rounded-xl text-center">
+          <h2 className="text-3xl font-bold mb-4 text-indigo-700">
+            {isPractice ? "Practice Quiz Submitted!" : "Quiz Submitted!"}
+          </h2>
+          <p className="text-lg mb-2">
+            Your Score:{" "}
+            <span className="font-bold text-green-700">
+              {score}/{questions.length}
+            </span>
+          </p>
+          {!isPractice && (
+            <p className="text-md text-gray-700 mb-2">
+              Remaining Attempts:{" "}
+              <span className="font-bold text-indigo-700">
+                {remainingAttempts}
+              </span>
+            </p>
+          )}
+          <button
+            className="mt-4 px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+            onClick={() => navigate("/dashboard")}
+          >
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
+    );
 
   const q = questions[current];
   const isAllAnswered =
@@ -78,7 +186,6 @@ function QuizPage() {
           <div className="text-lg text-indigo-500 mt-2">
             of {questions.length}
           </div>
-
           {/* Progress Bar */}
           <div className="w-full mt-6 h-2 bg-indigo-300 rounded">
             <div
@@ -93,6 +200,14 @@ function QuizPage() {
           <h2 className="text-3xl font-bold text-center mb-8 text-indigo-700">
             Quiz
           </h2>
+          {!isPractice && (
+            <div className="mb-4 text-md text-gray-700">
+              Remaining Attempts:{" "}
+              <span className="font-bold text-indigo-700">
+                {remainingAttempts !== null ? remainingAttempts : "Loading..."}
+              </span>
+            </div>
+          )}
           <div className="mb-8 p-6 rounded-lg bg-indigo-50 shadow">
             <p className="font-semibold text-lg mb-4 text-indigo-800">
               {q.question_text}

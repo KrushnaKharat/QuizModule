@@ -14,15 +14,15 @@ exports.getAllTopics = (req, res) => {
 
 exports.addTopic = (req, res) => {
   const { courseId } = req.params;
-  const { title } = req.body;
+  const { title, level, timer, max_attempts } = req.body;
 
   if (!title || !courseId) {
     return res.status(400).json({ error: "Title and courseId required" });
   }
 
   db.query(
-    "INSERT INTO topics (title, course_id) VALUES (?, ?)",
-    [title, courseId],
+    "INSERT INTO topics (title, course_id, level, timer, max_attempts) VALUES (?, ?, ?, ?, ?)",
+    [title, courseId, level, timer, max_attempts],
     (err, result) => {
       if (err) return res.status(500).json(err);
       res.json({ msg: "Topic added", topicId: result.insertId });
@@ -32,10 +32,10 @@ exports.addTopic = (req, res) => {
 
 exports.updateTopic = (req, res) => {
   const { topicId } = req.params;
-  const { title } = req.body;
+  const { title, level, timer } = req.body;
   db.query(
-    "UPDATE topics SET title = ? WHERE id = ?",
-    [title, topicId],
+    "UPDATE topics SET title=?, level=?, timer=? WHERE id = ?",
+    [title, level, timer, topicId],
     (err) => {
       if (err) return res.status(500).json(err);
       res.json({ msg: "Topic updated" });

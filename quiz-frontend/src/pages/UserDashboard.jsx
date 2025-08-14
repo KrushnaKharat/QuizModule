@@ -8,16 +8,42 @@ function UserDashboard() {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  
+
+
   const navigate = useNavigate();
 
-  const quizEmojis = ['🧠', '📘', '🎲', '🎯', '📝', '📚', '💡', '🚀', '🔬', '🎵'];
-  const topicEmojis = ['💻', '📊', '🧪', '📐', '📈', '🔍', '🧠', '🔢', '💡', '⚙️'];
+  const quizEmojis = [
+    "🧠",
+    "📘",
+    "🎲",
+    "🎯",
+    "📝",
+    "📚",
+    "💡",
+    "🚀",
+    "🔬",
+    "🎵",
+  ];
+  const topicEmojis = [
+    "💻",
+    "📊",
+    "🧪",
+    "📐",
+    "📈",
+    "🔍",
+    "🧠",
+    "🔢",
+    "💡",
+    "⚙️",
+  ];
   const topicBgColors = [
     "from-purple-100 to-purple-200",
     "from-pink-100 to-pink-200",
     "from-green-100 to-green-200",
     "from-yellow-100 to-yellow-200",
-    "from-blue-100 to-blue-200"
+    "from-blue-100 to-blue-200",
   ];
 
   useEffect(() => {
@@ -25,7 +51,7 @@ function UserDashboard() {
       try {
         const token = localStorage.getItem("token");
         const res = await axios.get("http://localhost:5000/api/courses", {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
         setQuizzes(res.data);
       } catch (err) {
@@ -100,25 +126,37 @@ function UserDashboard() {
               {topics.map((topic, index) => (
                 <div
                   key={topic.id}
-                  onClick={() => navigate(`/quiz/${topic.id}`)}
-                  className={`cursor-pointer rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.03] transition transform p-6 bg-gradient-to-br ${topicBgColors[index % topicBgColors.length]}`}
+                  className={`cursor-pointer rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.03] transition transform p-6 bg-gradient-to-br ${
+                    topicBgColors[index % topicBgColors.length]
+                  }`}
                   style={{
-                    animation: 'fadeInUp 0.5s ease forwards',
+                    animation: "fadeInUp 0.5s ease forwards",
                     animationDelay: `${index * 100}ms`,
-                    opacity: 0
+                    opacity: 0,
                   }}
                 >
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-lg font-bold text-indigo-700">
                       {topic.title}
                     </h3>
-                    <span className="text-2xl">{topicEmojis[index % topicEmojis.length]}</span>
+                    <span className="text-2xl">
+                      {topicEmojis[index % topicEmojis.length]}
+                    </span>
                   </div>
                   <p className="text-sm text-gray-700">
                     Start your quiz on this topic.
                   </p>
-                  <div className="mt-2 text-indigo-600 font-medium underline">
+                  <div
+                    className="mt-2 text-indigo-600 font-medium underline"
+                    onClick={() => navigate(`/quiz/${topic.id}`)}
+                  >
                     Start Quiz →
+                  </div>
+                  <div
+                    className="mt-2 text-indigo-600 font-medium underline"
+                    onClick={() => navigate(`/practicequiz/${topic.id}`)}
+                  >
+                    Start Practice Quiz →
                   </div>
                 </div>
               ))}
@@ -135,14 +173,18 @@ function UserDashboard() {
               onClick={() => handleCourseClick(quiz)}
               className="group cursor-pointer bg-white rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.03] transform transition duration-300 p-6"
               style={{
-                animation: 'fadeInUp 0.7s ease forwards',
+                animation: "fadeInUp 0.7s ease forwards",
                 animationDelay: `${index * 120}ms`,
-                opacity: 0
+                opacity: 0,
               }}
             >
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-indigo-700">{quiz.title}</h2>
-                <span className="text-3xl">{quizEmojis[index % quizEmojis.length]}</span>
+                <h2 className="text-xl font-bold text-indigo-700">
+                  {quiz.title}
+                </h2>
+                <span className="text-3xl">
+                  {quizEmojis[index % quizEmojis.length]}
+                </span>
               </div>
               <div className="mt-4 text-sm text-indigo-600 font-medium underline opacity-0 group-hover:opacity-100 transition">
                 View Topics →

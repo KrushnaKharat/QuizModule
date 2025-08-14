@@ -13,6 +13,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/quiz/:quizId" element={<QuizPage />} />
+        <Route path="/practicequiz/:quizId" element={<QuizPage />} />
       </Routes>
     </BrowserRouter>
   );
