@@ -217,7 +217,7 @@ function QuizPage() {
             <div className="mb-4 text-md text-gray-700">
               Remaining Attempts:{" "}
               <span className="font-bold text-indigo-700">
-                {remainingAttempts !== null ? remainingAttempts : "Loading..."}
+                {remainingAttempts}/3
               </span>
             </div>
           )}
