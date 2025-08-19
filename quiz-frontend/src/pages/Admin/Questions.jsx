@@ -55,6 +55,7 @@ function Questions({ topicId, token, onBack }) {
     } catch (err) {
       alert("Failed to fetch questions");
     }
+    
   };
 
   const handleAddQuestion = async () => {
