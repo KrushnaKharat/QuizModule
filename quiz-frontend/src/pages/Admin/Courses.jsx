@@ -197,7 +197,7 @@ function Courses({ onEditTopics }) {
               </div>
             </div>
             <div className="w-full">
-              {selectedCourseId === q.id && (
+              {/* {selectedCourseId === q.id && (
                 <div className="bg-white block rounded p-6 shadow mt-4">
                   <h3 className="text-xl font-semibold mb-4">
                     Add Topics for {q.title}
@@ -217,7 +217,7 @@ function Courses({ onEditTopics }) {
                     Add Topic
                   </button>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         ))}

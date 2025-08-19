@@ -7,6 +7,8 @@ import Questions from "./Admin/Questions";
 
 function AdminPanel() {
   const [showUsers, setShowUsers] = useState(false);
+  const [showScore, setShowScore] = useState(false);
+  const [attempts, setAttempts] = useState([]);
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [showTopics, setShowTopics] = useState(false);
@@ -15,16 +17,23 @@ function AdminPanel() {
 
   const [showQuestions, setShowQuestions] = useState(false);
   const [questionsTopicId, setQuestionsTopicId] = useState(null);
+  const [questionsType, setQuestionsType] = useState("questions");
 
   const handleAddQuestions = (topicId) => {
     setQuestionsTopicId(topicId);
+    setQuestionsType("questions");
+    setShowQuestions(true);
+  };
+  const handleAddPracticeQuestions = (topicId) => {
+    setQuestionsTopicId(topicId);
+    setQuestionsType("practicequestions");
     setShowQuestions(true);
   };
 
-  // Handler to go back to Topics
   const handleBackToTopics = () => {
     setShowQuestions(false);
     setQuestionsTopicId(null);
+    setQuestionsType("questions");
   };
 
   useEffect(() => {
@@ -42,6 +51,16 @@ function AdminPanel() {
       });
   }, [token]);
 
+  useEffect(() => {
+    if (showScore) {
+      axios
+        .get("http://localhost:5000/api/attempts/admin/attempts", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => setAttempts(res.data));
+    }
+  }, [showScore, token]);
+
   // Handler to open Topics
   const handleEditTopics = (courseId) => {
     setTopicsCourseId(courseId);
@@ -54,64 +73,136 @@ function AdminPanel() {
     setTopicsCourseId(null);
   };
 
+  const Scores = (
+    <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
+      <h2 className="text-2xl font-bold text-indigo-700 mb-6">
+        User Quiz Attempts
+      </h2>
+      <div className="overflow-x-auto">
+        <table className="min-w-full border border-gray-200 rounded-lg">
+          <thead>
+            <tr className="bg-indigo-100">
+              <th className="py-3 px-4 text-left font-semibold text-indigo-700">
+                User
+              </th>
+              <th className="py-3 px-4 text-left font-semibold text-indigo-700">
+                Topic
+              </th>
+              <th className="py-3 px-4 text-left font-semibold text-indigo-700">
+                Score
+              </th>
+              <th className="py-3 px-4 text-left font-semibold text-indigo-700">
+                Started
+              </th>
+              <th className="py-3 px-4 text-left font-semibold text-indigo-700">
+                Ended
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {attempts.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="py-6 text-center text-gray-500">
+                  No attempts found.
+                </td>
+              </tr>
+            ) : (
+              attempts.map((a) => (
+                <tr key={a.id} className="hover:bg-indigo-50 transition">
+                  <td className="py-2 px-4 border-b border-gray-100">
+                    {a.user_name}
+                  </td>
+                  <td className="py-2 px-4 border-b border-gray-100">
+                    {a.topic_title}
+                  </td>
+                  <td className="py-2 px-4 border-b border-gray-100 font-bold text-green-700">
+                    {a.score}
+                  </td>
+                  <td className="py-2 px-4 border-b border-gray-100">
+                    {a.started_at}
+                  </td>
+                  <td className="py-2 px-4 border-b border-gray-100">
+                    {a.ended_at}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen w-full flex bg-gray-50 overflow-hidden">
       <div className="w-1/5 bg-gray-500 flex flex-col p-4 gap-12 text-white align-middle text-lg">
-        <div className="text-center">
-          <h2>Hii.. {userName}</h2>
-          <p className="text-sm mt-2">{userEmail}</p>
-        </div>
-        <div className="flex flex-col text-center">
-          <a
-            href="#"
-            className="p-4"
-            onClick={() => {
-              setShowUsers(false);
-              setShowTopics(false);
-            }}
-          >
-            Home
-          </a>
-          <a
-            href="#"
-            className="p-4"
-            onClick={() => {
-              setShowUsers(false);
-              setShowTopics(false);
-            }}
-          >
-            Courses
-          </a>
-          <a
-            href="#"
-            className="p-4"
-            onClick={() => {
-              setShowUsers(true);
-              setShowTopics(false);
-            }}
-          >
-            Students
-          </a>
-          <a
-            href="#"
-            className="p-4"
-            onClick={() => {
-              setShowUsers(false);
-              setShowTopics(false);
-            }}
-          >
-            Scores
-          </a>
-          <a
-            href="#"
-            className="p-4"
-            onClick={() => {
-              setShowUsers(false);
-              setShowTopics(false);
-            }}
-          >
-            Add Questions
-          </a>
+        <div className="w-1/5 bg-gray-500 flex flex-col p-4 gap-12 text-white align-middle text-lg">
+          <div className="text-center">
+            <h2>Hii.. {userName}</h2>
+            <p className="text-sm mt-2">{userEmail}</p>
+          </div>
+          <div className="flex flex-col text-center">
+            <a
+              href="#"
+              className="p-4"
+              onClick={() => {
+                setShowUsers(false);
+                setShowTopics(false);
+                setShowScore(false);
+                setShowQuestions(false);
+              }}
+            >
+              Home
+            </a>
+            <a
+              href="#"
+              className="p-4"
+              onClick={() => {
+                setShowUsers(false);
+                setShowTopics(true);
+                setShowScore(false);
+                setShowQuestions(false);
+              }}
+            >
+              Courses
+            </a>
+            <a
+              href="#"
+              className="p-4"
+              onClick={() => {
+                setShowUsers(true);
+                setShowTopics(false);
+                setShowScore(false);
+                setShowQuestions(false);
+              }}
+            >
+              Students
+            </a>
+            <a
+              href="#"
+              className="p-4"
+              onClick={() => {
+                setShowScore(true);
+                setShowUsers(false);
+                setShowTopics(false);
+                setShowQuestions(false);
+              }}
+            >
+              Scores
+            </a>
+            <a
+              href="#"
+              className="p-4"
+              onClick={() => {
+                setShowUsers(false);
+                setShowTopics(false);
+                setShowScore(false);
+                setShowQuestions(true);
+              }}
+            >
+              Add Questions
+            </a>
+          </div>
         </div>
       </div>
       <div className="ml-2 w-3/4">
@@ -127,21 +218,26 @@ function AdminPanel() {
             Logout
           </button>
         </div>
+
         {/* Main content switch */}
-        {showUsers ? (
+        {showScore ? (
+          Scores
+        ) : showUsers ? (
           <Users token={token} />
         ) : showQuestions && questionsTopicId ? (
           <Questions
             topicId={questionsTopicId}
             token={token}
             onBack={handleBackToTopics}
+            type={questionsType}
           />
         ) : showTopics && topicsCourseId ? (
           <Topics
             courseId={topicsCourseId}
             token={token}
             onBack={handleBackToCourses}
-            onAddQuestions={handleAddQuestions} // pass handler
+            onAddQuestions={handleAddQuestions}
+            onAddPracticeQuestions={handleAddPracticeQuestions}
           />
         ) : (
           <Courses onEditTopics={handleEditTopics} />

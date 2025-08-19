@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 // "csv" or "excel"
 
-function Questions({ topicId, token, onBack }) {
+function Questions({ topicId, token, onBack, type = "questions" }) {
   const [importFile, setImportFile] = useState(null);
   const [importType, setImportType] = useState("");
   const handleImport = async () => {
@@ -43,14 +43,17 @@ function Questions({ topicId, token, onBack }) {
   useEffect(() => {
     fetchQuestions();
     // eslint-disable-next-line
-  }, [topicId]);
+  }, [topicId, type]);
 
   const fetchQuestions = async () => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/topics/${topicId}/questions`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const url =
+        type === "practicequestions"
+          ? `http://localhost:5000/api/practice/topics/${topicId}/practicequestions`
+          : `http://localhost:5000/api/topics/${topicId}/questions`;
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setQuestions(res.data);
     } catch (err) {
       alert("Failed to fetch questions");
@@ -60,11 +63,13 @@ function Questions({ topicId, token, onBack }) {
 
   const handleAddQuestion = async () => {
     try {
-      await axios.post(
-        `http://localhost:5000/api/topics/${topicId}/questions`,
-        newQuestion,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const url =
+        type === "practicequestions"
+          ? `http://localhost:5000/api/practice/topics/${topicId}/practicequestions`
+          : `http://localhost:5000/api/topics/${topicId}/questions`;
+      await axios.post(url, newQuestion, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setNewQuestion({
         question_text: "",
         option_a: "",
@@ -80,11 +85,11 @@ function Questions({ topicId, token, onBack }) {
   };
 
   return (
-    <div className="bg-white rounded shadow p-6 gap-2">
+    <div className="bg-white rounded shadow p-6 flex flex-col gap-2">
       <button className="mb-4 text-blue-600 underline" onClick={onBack}>
         &larr; Back to Topics
       </button>
-      <h3 className="text-xl font-semibold mb-4">Questions</h3>
+      <h3 className="text-xl font-semibold mb-4">Questions   </h3>
       <input
         className="border p-2 rounded w-full"
         placeholder="Question text"
@@ -135,40 +140,37 @@ function Questions({ topicId, token, onBack }) {
           }
         />
       </div>
+      <div className="mb-3">
+        <button
+          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+          onClick={handleAddQuestion}
+        >
+          Add Question
+        </button>
+      </div>
 
-      <div className="mb-4 flex gap-4">
-        <div>
+      <div className="mb-4 flex flex-col gap-2">
+        <label htmlFor="importFile">Upload CSV or Excel File</label>
+        <div className="flex gap-2">
           <input
+            id="importFile"
             type="file"
-            accept=".csv"
+            accept=".csv,.xlsx,.xls"
             onChange={(e) => {
               setImportFile(e.target.files[0]);
-              setImportType("csv");
+              // Set importType based on file extension
+              const ext = e.target.files[0]?.name.split(".").pop();
+              if (ext === "csv") setImportType("csv");
+              else if (ext === "xlsx" || ext === "xls") setImportType("excel");
+              else setImportType("");
             }}
           />
           <button
-            className="bg-green-600 text-white px-4 py-2 rounded ml-2"
+            className="bg-green-600 text-white px-4 py-2 rounded"
             onClick={handleImport}
-            disabled={!importFile || importType !== "csv"}
+            disabled={!importFile || !importType}
           >
-            Import CSV
-          </button>
-        </div>
-        <div>
-          <input
-            type="file"
-            accept=".xlsx,.xls"
-            onChange={(e) => {
-              setImportFile(e.target.files[0]);
-              setImportType("excel");
-            }}
-          />
-          <button
-            className="bg-blue-600 text-white px-4 py-2 rounded ml-2"
-            onClick={handleImport}
-            disabled={!importFile || importType !== "excel"}
-          >
-            Import Excel
+            Import
           </button>
         </div>
       </div>

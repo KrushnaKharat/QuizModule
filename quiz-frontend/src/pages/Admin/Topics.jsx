@@ -1,11 +1,25 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-function Topics({ courseId, onBack, token, onAddQuestions }) {
-  const [newTopic, setNewTopic] = useState({ title: "" });
+function Topics({
+  courseId,
+  onBack,
+  token,
+  onAddQuestions,
+  onAddPracticeQuestions,
+}) {
   const [topics, setTopics] = useState([]);
   const [editTopicId, setEditTopicId] = useState(null);
   const [editTopicTitle, setEditTopicTitle] = useState("");
+  const [editTopicLevel, setEditTopicLevel] = useState("");
+  const [editTopicTimer, setEditTopicTimer] = useState("");
+
+  const [newTopic, setNewTopic] = useState({
+    title: "",
+    level: "", // default value
+    timer: "", // in seconds or minutes
+    max_attempts: 3, // default value
+  });
 
   const handleAddTopic = async () => {
     if (!newTopic.title.trim()) {
@@ -15,10 +29,15 @@ function Topics({ courseId, onBack, token, onAddQuestions }) {
     try {
       await axios.post(
         `http://localhost:5000/api/course/${courseId}/topics`,
-        { title: newTopic.title },
+        newTopic,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setNewTopic({ title: "" });
+      setNewTopic({
+        title: "",
+        level: "easy",
+        timer: "",
+        max_attempts: 3,
+      });
       fetchTopics();
     } catch (err) {
       alert("Failed to add topic");
@@ -46,12 +65,14 @@ function Topics({ courseId, onBack, token, onAddQuestions }) {
     try {
       await axios.put(
         `http://localhost:5000/api/course/${courseId}/topics/${topicId}`,
-        { title: editTopicTitle },
+        { title: editTopicTitle, level: editTopicLevel, timer: editTopicTimer },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchTopics();
       setEditTopicId(null);
       setEditTopicTitle("");
+      setEditTopicLevel("");
+      setEditTopicTimer("");
     } catch (err) {
       alert("Failed to edit topic");
     }
@@ -75,12 +96,41 @@ function Topics({ courseId, onBack, token, onAddQuestions }) {
         &larr; Back to Courses
       </button>
       <h3 className="text-xl font-semibold mb-4">Topics</h3>
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 flex flex-col gap-2">
         <input
           className="border p-2 rounded"
           placeholder="New Topic"
           value={newTopic.title}
-          onChange={(e) => setNewTopic({ title: e.target.value })}
+          onChange={(e) => setNewTopic({ ...newTopic, title: e.target.value })}
+        />
+
+        <select
+          className="border p-2 rounded"
+          value={newTopic.level}
+          onChange={(e) => setNewTopic({ ...newTopic, level: e.target.value })}
+        >
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+        <input
+          className="border p-2 rounded"
+          type="number"
+          min="1"
+          placeholder="Timer (minutes)"
+          value={newTopic.timer}
+          onChange={(e) => setNewTopic({ ...newTopic, timer: e.target.value })}
+        />
+        <input
+          className="border p-2 rounded"
+          type="number"
+          min="1"
+          max="3"
+          placeholder="Max Attempts (default 3)"
+          value={newTopic.max_attempts}
+          onChange={(e) =>
+            setNewTopic({ ...newTopic, max_attempts: e.target.value })
+          }
         />
         <button
           className="bg-purple-500 text-white px-4 py-2 rounded"
@@ -99,11 +149,28 @@ function Topics({ courseId, onBack, token, onAddQuestions }) {
             className="flex items-center justify-between mb-2 "
           >
             {editTopicId === topic.id ? (
-              <>
+              <div className="w-full">
                 <input
                   className="border p-1 rounded"
                   value={editTopicTitle}
                   onChange={(e) => setEditTopicTitle(e.target.value)}
+                />
+                <select
+                  className="border p-2 rounded"
+                  value={editTopicLevel}
+                  onChange={(e) => setEditTopicLevel(e.target.value)}
+                >
+                  <option value="easy">Easy</option>
+                  <option value="medium">Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+                <input
+                  className="border p-2 rounded"
+                  type="number"
+                  min="1"
+                  placeholder="Timer (minutes)"
+                  value={editTopicTimer}
+                  onChange={(e) => setEditTopicTimer(e.target.value)}
                 />
                 <button
                   className="bg-orange-400 text-white px-2 py-1 rounded ml-2"
@@ -117,9 +184,9 @@ function Topics({ courseId, onBack, token, onAddQuestions }) {
                 >
                   Cancel
                 </button>
-              </>
+              </div>
             ) : (
-              <div className="flex w-1/2 justify-between gap-2">
+              <div className="flex w-1/2 justify-between gap-2 ">
                 <div className="flex w-full justify-between gap-2 text-center ">
                   <p className="align-middle justify-center content-center text-xl">
                     {topic.title}{" "}
@@ -216,12 +283,18 @@ function Topics({ courseId, onBack, token, onAddQuestions }) {
                     </button>
                   </div>
                 </div>
-                <div className=" ">
+                <div className="flex w-full">
                   <button
-                    className="bg-green-600 text-white  px-2 py-1 rounded mr-2"
+                    className="bg-green-600 text-white px-2 py-1 rounded mr-2"
                     onClick={() => onAddQuestions(topic.id)}
                   >
                     Add Questions
+                  </button>
+                  <button
+                    className="bg-blue-600 text-white px-2 py-1 rounded"
+                    onClick={() => onAddPracticeQuestions(topic.id)}
+                  >
+                    Add Practice Questions
                   </button>
                 </div>
               </div>
