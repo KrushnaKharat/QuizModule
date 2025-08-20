@@ -47,7 +47,7 @@ cd QuizModule
 
 ### 2. **Setup the Database**
 
-- Create a MySQL database (e.g., `quizdb`).
+- Create a MySQL database (e.g., `quiz_app`).
 - Import the schema from:
   ```
   quiz-app-backend/models/dbTables.sql
