@@ -64,9 +64,22 @@ function UserDashboard() {
     setError("");
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = "/";
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white p-6">
-      <h1 className="text-4xl font-bold text-indigo-700 mb-10">Your Courses</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-4xl font-bold text-indigo-700">Your Courses</h1>
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 text-white px-4 py-2 rounded"
+        >
+          Logout
+        </button>
+      </div>
       {error && <div className="text-red-600 mb-4">{error}</div>}
       {loading && <div className="text-blue-700 mb-4">Loading...</div>}
 
