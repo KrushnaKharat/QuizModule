@@ -2,7 +2,7 @@
 
 ## 📚 Introduction
 
-**Quiz Module** is a full-stack web application for managing and taking quizzes, designed for educational institutions and online learning platforms. It features user authentication, admin management, course and topic assignment, quiz attempts, and score tracking. The project is built with a modern tech stack and is easy to set up and extend.
+**Quiz Module** is a full-stack web application for managing and taking quizzes, designed for educational institutions and online learning platforms. It features user authentication, admin management, course and topic assignment, quiz attempts and score tracking. The project is built with a modern tech stack and is easy to set up and extend.
 
 ---
 
@@ -19,7 +19,7 @@
 ## 🚀 Features
 
 - User and Admin authentication
-- Admin dashboard for managing users, courses, topics, and questions
+- Admin dashboard for managing users, courses, topics and questions
 - Assign courses to users
 - Users can view and attempt quizzes only for assigned courses
 - Score tracking and attempt limits
@@ -81,7 +81,7 @@ npm start
 ## 📝 Usage
 
 - **Admin Login:** Create an admin user in the database or via the UI.
-- **Admin Panel:** Manage users, assign courses, add topics and questions.
+- **Admin Panel:** Manage users, assign courses add topics and questions.
 - **User Login:** Users see only their assigned courses and can attempt quizzes.
 - **Logout:** Secure logout for both users and admins.
 
@@ -90,7 +90,7 @@ npm start
 ## 🔍 SEO & Discoverability
 
 - **Keywords:** quiz app, react quiz, node quiz, online quiz platform, education, admin dashboard, course assignment, full stack quiz, MySQL quiz app
-- **Description:** A full-featured quiz platform with admin and user roles, course assignment, and secure authentication, built with React, Node.js, and MySQL.
+- **Description:** A full-featured quiz platform with admin and user roles, course assignment and secure authentication, built with React, Node.js, and MySQL.
 
 ---
 
