@@ -5,6 +5,7 @@ const {
   submitQuiz,
   getUserAttempts,
   getRemainingAttempts,
+  getAllRemainingAttemptsForUser,
 } = require("../controllers/attemptController");
 
 // Submit quiz
@@ -15,5 +16,10 @@ router.get("/admin/attempts", authMiddleware, getUserAttempts);
 
 // Get remaining attempts for user/topic
 router.get("/remaining/:userId/:topicId", authMiddleware, getRemainingAttempts);
+router.get(
+  "/remaining/all/:userId",
+  authMiddleware,
+  getAllRemainingAttemptsForUser
+);
 
 module.exports = router;

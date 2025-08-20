@@ -4,6 +4,8 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import "./QuizPage.css";
 
 function QuizPage() {
+  const [maxAttempts, setMaxAttempts] = useState(3);
+
   const { quizId } = useParams();
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
@@ -21,30 +23,18 @@ function QuizPage() {
   const token = localStorage.getItem("token");
   const isPractice = location.pathname.startsWith("/practicequiz");
 
-  // Function to shuffle array
-  const shuffleArray = (arr) => {
-    const shuffled = [...arr];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-  };
-
   useEffect(() => {
-
     setLoading(true);
+
     const endpoint = isPractice
       ? `http://localhost:5000/api/practice/topics/${quizId}/practicequestions`
       : `http://localhost:5000/api/topics/${quizId}/questions`;
-
     axios
       .get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        const shuffled = shuffleArray(res.data).slice(0, 10); // take only 10 shuffled questions
-        setQuestions(shuffled);
+        setQuestions(res.data);
         setLoading(false);
       })
       .catch((err) => {
@@ -55,16 +45,26 @@ function QuizPage() {
 
     // Fetch remaining attempts for quiz
     if (!isPractice) {
-      const userId = JSON.parse(localStorage.getItem("user"))?.id;
-      if (userId) {
-        axios
-          .get(
-            `http://localhost:5000/api/attempts/remaining/${userId}/${quizId}`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          )
-          .then((res) => setRemainingAttempts(res.data.remaining))
-          .catch(() => setRemainingAttempts(null));
-      }
+      axios
+        .get("http://localhost:5000/api/auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => {
+          const userId = res.data.id;
+          axios
+            .get(
+              `http://localhost:5000/api/attempts/remaining/${userId}/${quizId}`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            )
+            .then((res) => {
+              setRemainingAttempts(res.data.remaining);
+              setMaxAttempts(res.data.maxAttempts || 3);
+            })
+            .catch(() => {
+              setRemainingAttempts(null);
+              setMaxAttempts(3);
+            });
+        });
     }
     // eslint-disable-next-line
   }, [quizId, location.pathname]);
@@ -87,6 +87,7 @@ function QuizPage() {
 
   const handleSubmit = async () => {
     const isAllAnswered = questions.every((q) => answers[q.id]);
+
     if (!isAllAnswered) {
       alert("Please answer all questions before submitting.");
       return;
@@ -123,16 +124,20 @@ function QuizPage() {
       );
       setSubmitted(true);
       // Refetch remaining attempts
-      const userId = JSON.parse(localStorage.getItem("user"))?.id;
-      if (userId) {
-        axios
-          .get(
-            `http://localhost:5000/api/attempts/remaining/${userId}/${quizId}`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          )
-          .then((res) => setRemainingAttempts(res.data.remaining))
-          .catch(() => {});
-      }
+      axios
+        .get("http://localhost:5000/api/auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => {
+          const userId = res.data.id;
+          axios
+            .get(
+              `http://localhost:5000/api/attempts/remaining/${userId}/${quizId}`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            )
+            .then((res) => setRemainingAttempts(res.data.remaining))
+            .catch(() => setRemainingAttempts(null));
+        });
     } catch (err) {
       alert(
         err.response?.data?.msg ||
@@ -147,7 +152,7 @@ function QuizPage() {
     }
   };
 
-  if (loading) return <div className="text-center p-10">Shuffling questions...</div>;
+  if (loading) return <div className="text-center p-10">Loading quiz...</div>;
   if (error)
     return <div className="text-center p-10 text-red-500">{error}</div>;
 
@@ -169,7 +174,8 @@ function QuizPage() {
             <p className="text-md text-gray-700 mb-2">
               Remaining Attempts:{" "}
               <span className="font-bold text-indigo-700">
-                {remainingAttempts}
+                {remainingAttempts !== null ? remainingAttempts : "Loading..."}/
+                {maxAttempts}
               </span>
             </p>
           )}
@@ -217,7 +223,8 @@ function QuizPage() {
             <div className="mb-4 text-md text-gray-700">
               Remaining Attempts:{" "}
               <span className="font-bold text-indigo-700">
-                {remainingAttempts}/3
+                {remainingAttempts !== null ? remainingAttempts : "Loading..."}/
+                {maxAttempts}
               </span>
             </div>
           )}
@@ -296,9 +303,12 @@ function QuizPage() {
             {questions.map((qItem, index) => {
               const isCurrent = current === index;
               const isAnswered = answers[qItem.id];
+              const isSkipped = index < current && !isAnswered;
 
               let bgColor = "bg-gray-200 text-gray-700";
-              if (isCurrent || isAnswered) bgColor = "bg-blue-500 text-white";
+              if (isCurrent) bgColor = "bg-blue-500 text-white";
+              else if (isAnswered) bgColor = "bg-green-500 text-white";
+              else if (isSkipped) bgColor = "bg-red-500 text-white";
 
               return (
                 <div
