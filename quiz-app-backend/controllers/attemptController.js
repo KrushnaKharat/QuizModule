@@ -89,9 +89,29 @@ exports.getRemainingAttempts = (req, res) => {
         (err2, result2) => {
           if (err2) return res.status(500).json(err2);
           const maxAttempts = result2[0]?.max_attempts || 3;
-          res.json({ remaining: maxAttempts - result[0].cnt });
+          res.json({ remaining: maxAttempts - result[0].cnt, maxAttempts });
         }
       );
+    }
+  );
+};
+
+exports.getAllRemainingAttemptsForUser = (req, res) => {
+  const userId = req.params.userId;
+  db.query(
+    `SELECT t.id as topic_id, t.title, t.max_attempts,
+      (t.max_attempts - IFNULL(a.cnt,0)) as remaining_attempts
+     FROM topics t
+     LEFT JOIN (
+       SELECT topic_id, COUNT(*) as cnt
+       FROM quiz_attempts
+       WHERE user_id = ?
+       GROUP BY topic_id
+     ) a ON t.id = a.topic_id`,
+    [userId],
+    (err, results) => {
+      if (err) return res.status(500).json(err);
+      res.json(results);
     }
   );
 };
