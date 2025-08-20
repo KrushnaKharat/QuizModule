@@ -2,7 +2,9 @@
 
 # dependencies
 /quiz-app-backend/node_modules
+/quiz-app-backend/config/db.js
 /quiz-frontend/node_modules
+
 
 
 /.pnp
