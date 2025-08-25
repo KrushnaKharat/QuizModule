@@ -15,7 +15,7 @@ function UserDashboard() {
   useEffect(() => {
     if (token) {
       axios
-        .get("http://localhost:5000/api/auth/me", {
+        .get("https://quizmodule.onrender.com/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => setUserId(res.data.id))
@@ -28,7 +28,7 @@ function UserDashboard() {
     if (userId) {
       setLoading(true);
       axios
-        .get(`http://localhost:5000/api/auth/users/${userId}/courses`, {
+        .get(`https://quizmodule.onrender.com/api/auth/users/${userId}/courses`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) =>
@@ -44,7 +44,7 @@ function UserDashboard() {
     if (selectedCourse) {
       setLoading(true);
       axios
-        .get(`http://localhost:5000/api/course/${selectedCourse.id}/topics`, {
+        .get(`https://quizmodule.onrender.com/api/course/${selectedCourse.id}/topics`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => setTopics(res.data))

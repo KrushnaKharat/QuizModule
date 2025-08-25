@@ -28,14 +28,16 @@ function QuizPage() {
     setLoading(true);
 
     const endpoint = isPractice
-      ? `http://localhost:5000/api/practice/topics/${quizId}/practicequestions`
-      : `http://localhost:5000/api/topics/${quizId}/questions`;
+      ? `https://quizmodule.onrender.com/api/practice/topics/${quizId}/practicequestions`
+      : `https://quizmodule.onrender.com/api/topics/${quizId}/questions`;
     axios
       .get(endpoint, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        setQuestions(res.data);
+        // Shuffle and select 20 questions
+        const shuffled = res.data.sort(() => Math.random() - 0.5);
+        setQuestions(shuffled.slice(0, 20));
         setLoading(false);
       })
       .catch((err) => {
@@ -47,14 +49,14 @@ function QuizPage() {
     // Fetch remaining attempts for quiz
     if (!isPractice) {
       axios
-        .get("http://localhost:5000/api/auth/me", {
+        .get("https://quizmodule.onrender.com/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {
           const userId = res.data.id;
           axios
             .get(
-              `http://localhost:5000/api/attempts/remaining/${userId}/${quizId}`,
+              `https://quizmodule.onrender.com/api/attempts/remaining/${userId}/${quizId}`,
               { headers: { Authorization: `Bearer ${token}` } }
             )
             .then((res) => {
@@ -115,7 +117,7 @@ function QuizPage() {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/attempts/submit",
+        "https://quizmodule.onrender.com/api/attempts/submit",
         {
           topicId: quizId,
           answers: answerArr,
@@ -126,14 +128,14 @@ function QuizPage() {
       setSubmitted(true);
       // Refetch remaining attempts
       axios
-        .get("http://localhost:5000/api/auth/me", {
+        .get("https://quizmodule.onrender.com/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {
           const userId = res.data.id;
           axios
             .get(
-              `http://localhost:5000/api/attempts/remaining/${userId}/${quizId}`,
+              `https://quizmodule.onrender.com/api/attempts/remaining/${userId}/${quizId}`,
               { headers: { Authorization: `Bearer ${token}` } }
             )
             .then((res) => setRemainingAttempts(res.data.remaining))
@@ -159,8 +161,6 @@ function QuizPage() {
 
   // Show result after submit
   if (submitted) {
-    // State for result navigation
-
     // Prepare result data
     const resultData = questions.map((q) => {
       const selected = answers[q.id];

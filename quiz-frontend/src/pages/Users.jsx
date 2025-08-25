@@ -63,7 +63,7 @@ function Users({ token }) {
 
   const fetchUsers = () => {
     axios
-      .get("http://localhost:5000/api/auth/users", {
+      .get("https://quizmodule.onrender.com/api/auth/users", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setUsers(res.data));
@@ -71,7 +71,7 @@ function Users({ token }) {
 
   const fetchCourses = () => {
     axios
-      .get("http://localhost:5000/api/courses", {
+      .get("https://quizmodule.onrender.com/api/courses", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setCourses(res.data));
@@ -79,7 +79,7 @@ function Users({ token }) {
 
   const handleDelete = (id) => {
     axios
-      .delete(`http://localhost:5000/api/auth/users/${id}`, {
+      .delete(`https://quizmodule.onrender.com/api/auth/users/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => fetchUsers());
@@ -87,7 +87,7 @@ function Users({ token }) {
 
   const handleAdd = (e) => {
     e.preventDefault();
-    axios.post("http://localhost:5000/api/auth/register", newUser).then(() => {
+    axios.post("https://quizmodule.onrender.com/api/auth/register", newUser).then(() => {
       setNewUser({
         name: "",
         email: "",
@@ -118,7 +118,7 @@ function Users({ token }) {
   // Open edit modal and fetch user's courses
   const openEditModal = (user) => {
     axios
-      .get(`http://localhost:5000/api/auth/users/${user.id}/courses`, {
+      .get(`https://quizmodule.onrender.com/api/auth/users/${user.id}/courses`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -137,7 +137,7 @@ function Users({ token }) {
     e.preventDefault();
     axios
       .put(
-        `http://localhost:5000/api/auth/users/${editUser.id}`,
+        `https://quizmodule.onrender.com/api/auth/users/${editUser.id}`,
         {
           name: editUser.name,
           email: editUser.email,
@@ -351,7 +351,7 @@ function UserCourses({ userId, token }) {
   const [courses, setCourses] = useState([]);
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/auth/users/${userId}/courses`, {
+      .get(`https://quizmodule.onrender.com/api/auth/users/${userId}/courses`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setCourses(res.data));
