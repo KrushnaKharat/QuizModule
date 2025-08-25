@@ -5,6 +5,7 @@ import "./QuizPage.css";
 
 function QuizPage() {
   const [maxAttempts, setMaxAttempts] = useState(3);
+  const [resultCurrent, setResultCurrent] = useState(0);
 
   const { quizId } = useParams();
   const [questions, setQuestions] = useState([]);
@@ -157,10 +158,30 @@ function QuizPage() {
     return <div className="text-center p-10 text-red-500">{error}</div>;
 
   // Show result after submit
-  if (submitted)
+  if (submitted) {
+    // State for result navigation
+
+    // Prepare result data
+    const resultData = questions.map((q) => {
+      const selected = answers[q.id];
+      const isCorrect = selected === q.correct_option;
+      return {
+        question_text: q.question_text,
+        options: ["A", "B", "C", "D"].map((opt) => ({
+          key: opt,
+          value: q[`option_${opt.toLowerCase()}`],
+        })),
+        selected,
+        correct_option: q.correct_option,
+        isCorrect,
+      };
+    });
+
+    const currentResult = resultData[resultCurrent];
+
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200">
-        <div className="bg-white shadow-lg px-8 py-10 rounded-xl text-center">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 gap-2 to-indigo-200">
+        <div className="bg-white shadow-lg rounded-xl px-8 py-8 w-full max-w-xl flex flex-col items-center">
           <h2 className="text-3xl font-bold mb-4 text-indigo-700">
             {isPractice ? "Practice Quiz Submitted!" : "Quiz Submitted!"}
           </h2>
@@ -186,8 +207,96 @@ function QuizPage() {
             Back to Dashboard
           </button>
         </div>
+
+        {/* Result Card for Each Question */}
+        <div className="bg-white shadow-lg rounded-xl px-8 py-8 w-full max-w-xl flex flex-col items-center">
+          <div className="mb-4 w-full">
+            <div className="text-lg font-semibold text-indigo-700 mb-2">
+              Question {resultCurrent + 1} of {questions.length}
+            </div>
+            <div className="text-md font-bold mb-4 text-gray-800">
+              {currentResult.question_text}
+            </div>
+            <div className="flex flex-col gap-2 mb-4">
+              {currentResult.options.map((opt) => {
+                const isSelected = currentResult.selected === opt.key;
+                const isCorrect = currentResult.correct_option === opt.key;
+                return (
+                  <div
+                    key={opt.key}
+                    className={`flex items-center gap-2 px-3 py-2 rounded border
+                    ${
+                      isSelected
+                        ? isCorrect
+                          ? "bg-green-100 border-green-400"
+                          : "bg-red-100 border-red-400"
+                        : "bg-gray-50 border-gray-200"
+                    }
+                  `}
+                  >
+                    <span
+                      className={`font-bold ${
+                        isSelected
+                          ? isCorrect
+                            ? "text-green-700"
+                            : "text-red-700"
+                          : "text-gray-700"
+                      }`}
+                    >
+                      {opt.key}.
+                    </span>
+                    <span
+                      className={`${
+                        isSelected
+                          ? isCorrect
+                            ? "text-green-700"
+                            : "text-red-700"
+                          : "text-gray-700"
+                      }`}
+                    >
+                      {opt.value}
+                    </span>
+                    {isSelected && (
+                      <span
+                        className="ml-2 px-2 py-1 rounded text-xs font-semibold"
+                        style={{
+                          background: isCorrect ? "#bbf7d0" : "#fecaca",
+                          color: isCorrect ? "#166534" : "#991b1b",
+                        }}
+                      >
+                        {isCorrect ? "Correct" : "Incorrect"}
+                      </span>
+                    )}
+                    {isCorrect && !isSelected && (
+                      <span className="ml-2 px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-700">
+                        Correct Answer
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="flex justify-between w-full mt-2">
+            <button
+              className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
+              disabled={resultCurrent === 0}
+              onClick={() => setResultCurrent((prev) => prev - 1)}
+            >
+              Previous
+            </button>
+            <button
+              className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+              disabled={resultCurrent === questions.length - 1}
+              onClick={() => setResultCurrent((prev) => prev + 1)}
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     );
+  }
 
   const q = questions[current];
   const isAllAnswered =
