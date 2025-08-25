@@ -12,7 +12,7 @@ function Questions({ topicId, token, onBack, type = "questions" }) {
 
     try {
       await axios.post(
-        `http://localhost:5000/api/topics/${topicId}/import`,
+        `https://quizmodule.onrender.com/api/topics/${topicId}/import`,
         formData,
         {
           headers: {
@@ -49,8 +49,8 @@ function Questions({ topicId, token, onBack, type = "questions" }) {
     try {
       const url =
         type === "practicequestions"
-          ? `http://localhost:5000/api/practice/topics/${topicId}/practicequestions`
-          : `http://localhost:5000/api/topics/${topicId}/questions`;
+          ? `https://quizmodule.onrender.com/api/practice/topics/${topicId}/practicequestions`
+          : `https://quizmodule.onrender.com/api/topics/${topicId}/questions`;
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -65,8 +65,8 @@ function Questions({ topicId, token, onBack, type = "questions" }) {
     try {
       const url =
         type === "practicequestions"
-          ? `http://localhost:5000/api/practice/topics/${topicId}/practicequestions`
-          : `http://localhost:5000/api/topics/${topicId}/questions`;
+          ? `https://quizmodule.onrender.com/api/practice/topics/${topicId}/practicequestions`
+          : `https://quizmodule.onrender.com/api/topics/${topicId}/questions`;
       await axios.post(url, newQuestion, {
         headers: { Authorization: `Bearer ${token}` },
       });

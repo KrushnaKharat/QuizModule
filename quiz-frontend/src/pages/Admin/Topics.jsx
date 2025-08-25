@@ -28,7 +28,7 @@ function Topics({
     }
     try {
       await axios.post(
-        `http://localhost:5000/api/course/${courseId}/topics`,
+        `https://quizmodule.onrender.com/api/course/${courseId}/topics`,
         newTopic,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -52,7 +52,7 @@ function Topics({
   const fetchTopics = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/course/${courseId}/topics`,
+        `https://quizmodule.onrender.com/api/course/${courseId}/topics`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setTopics(res.data);
@@ -64,7 +64,7 @@ function Topics({
   const handleEditTopic = async (topicId) => {
     try {
       await axios.put(
-        `http://localhost:5000/api/course/${courseId}/topics/${topicId}`,
+        `https://quizmodule.onrender.com/api/course/${courseId}/topics/${topicId}`,
         { title: editTopicTitle, level: editTopicLevel, timer: editTopicTimer },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -81,7 +81,7 @@ function Topics({
   const handleDeleteTopic = async (topicId) => {
     try {
       await axios.delete(
-        `http://localhost:5000/api/course/${courseId}/topics/${topicId}`,
+        `https://quizmodule.onrender.com/api/course/${courseId}/topics/${topicId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchTopics();

@@ -38,7 +38,7 @@ function AdminPanel() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/auth/me", {
+      .get("https://quizmodule.onrender.com/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -54,7 +54,7 @@ function AdminPanel() {
   useEffect(() => {
     if (showScore) {
       axios
-        .get("http://localhost:5000/api/attempts/admin/attempts", {
+        .get("https://quizmodule.onrender.com/api/attempts/admin/attempts", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => setAttempts(res.data));

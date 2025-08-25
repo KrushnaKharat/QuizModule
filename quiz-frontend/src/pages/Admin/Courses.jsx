@@ -26,7 +26,7 @@ function Courses({ onEditTopics }) {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/courses", {
+      .get("https://quizmodule.onrender.com/api/courses", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setCourse(res.data));
@@ -34,7 +34,7 @@ function Courses({ onEditTopics }) {
 
   const loadQuestions = async (id) => {
     setQuizId(id);
-    const res = await axios.get(`http://localhost:5000/api/questions/${id}`, {
+    const res = await axios.get(`https://quizmodule.onrender.com/api/questions/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     setQuestions(res.data);
@@ -55,11 +55,11 @@ function Courses({ onEditTopics }) {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/courses", newCourse, {
+      await axios.post("https://quizmodule.onrender.com/api/courses", newCourse, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const res = await axios.get("http://localhost:5000/api/courses", {
+      const res = await axios.get("https://quizmodule.onrender.com/api/courses", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -74,7 +74,7 @@ function Courses({ onEditTopics }) {
   const addTopic = async () => {
     try {
       await axios.post(
-        `http://localhost:5000/api/course/${selectedCourseId}/topics`,
+        `https://quizmodule.onrender.com/api/course/${selectedCourseId}/topics`,
         { title: newTopic.title },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -94,7 +94,7 @@ function Courses({ onEditTopics }) {
   const fetchTopics = async (courseId) => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/course/${courseId}/topics`,
+        `https://quizmodule.onrender.com/api/course/${courseId}/topics`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setTopics(res.data);
@@ -105,11 +105,11 @@ function Courses({ onEditTopics }) {
   };
 
   const deleteTopic = async (id) => {
-    await axios.delete(`http://localhost:5000/api/courses/${id}`, {
+    await axios.delete(`https://quizmodule.onrender.com/api/courses/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    const res = await axios.get("http://localhost:5000/api/courses", {
+    const res = await axios.get("https://quizmodule.onrender.com/api/courses", {
       headers: { Authorization: `Bearer ${token}` },
     });
     setCourse(res.data);
@@ -117,7 +117,7 @@ function Courses({ onEditTopics }) {
 
   const addQuestion = async () => {
     await axios.post(
-      "http://localhost:5000/api/questions",
+      "https://quizmodule.onrender.com/api/questions",
       { ...newQuestion, quiz_id: quizId },
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -127,14 +127,14 @@ function Courses({ onEditTopics }) {
   };
 
   const deleteQuestion = async (id) => {
-    await axios.delete(`http://localhost:5000/api/questions/${id}`, {
+    await axios.delete(`https://quizmodule.onrender.com/api/questions/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     loadQuestions(quizId);
   };
 
   const updateQuestion = async (q) => {
-    await axios.put(`http://localhost:5000/api/questions/${q.id}`, q, {
+    await axios.put(`https://quizmodule.onrender.com/api/questions/${q.id}`, q, {
       headers: { Authorization: `Bearer ${token}` },
     });
     loadQuestions(quizId);
