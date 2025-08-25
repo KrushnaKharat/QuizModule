@@ -1,23 +1,30 @@
-const db = require("../config/db");
+const pool = require("../config/db");
 
-exports.getAllQuizzes = (req, res) => {
-  db.query("SELECT * FROM courses", (err, results) => {
-    if (err) return res.status(500).json(err);
-    res.json(results);
-  });
+exports.getAllQuizzes = async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM courses");
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
-exports.createCourse = (req, res) => {
+exports.createCourse = async (req, res) => {
   const { title } = req.body;
-  db.query("INSERT INTO courses SET ?", { title }, (err) => {
-    if (err) return res.status(500).json(err);
+  try {
+    await pool.query("INSERT INTO courses (title) VALUES ($1)", [title]);
     res.json({ msg: "Course created" });
-  });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
-exports.deleteTopic = (req, res) => {
+
+exports.deleteTopic = async (req, res) => {
   const { id } = req.params;
-  db.query("DELETE FROM courses WHERE id = ?", [id], (err) => {
-    if (err) return res.status(500).json(err);
+  try {
+    await pool.query("DELETE FROM courses WHERE id = $1", [id]);
     res.json({ msg: "Topic deleted" });
-  });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
