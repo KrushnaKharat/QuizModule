@@ -35,9 +35,9 @@ function QuizPage() {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        // Shuffle and select 20 questions
+        // Shuffle and select 10 questions
         const shuffled = res.data.sort(() => Math.random() - 0.5);
-        setQuestions(shuffled.slice(0, 20));
+        setQuestions(shuffled.slice(0, 10));
         setLoading(false);
       })
       .catch((err) => {
