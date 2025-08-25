@@ -1,117 +1,116 @@
-const db = require("../config/db");
+const pool = require("../config/db");
 
-exports.submitQuiz = (req, res) => {
+exports.submitQuiz = async (req, res) => {
   const userId = req.user.id;
   const { topicId, answers, score } = req.body;
   const startedAt = req.body.startedAt || new Date();
   const endedAt = new Date();
 
-  // Check attempts
-  db.query(
-    "SELECT COUNT(*) AS cnt FROM quiz_attempts WHERE user_id=? AND topic_id=?",
-    [userId, topicId],
-    (err, result) => {
-      if (err) return res.status(500).json(err);
-      if (result[0].cnt >= 3) {
-        return res.status(403).json({ msg: "Maximum attempts reached" });
-      }
-
-      // Insert attempt
-      db.query(
-        "INSERT INTO quiz_attempts (user_id, topic_id, score, started_at, ended_at) VALUES (?, ?, ?, ?, ?)",
-        [userId, topicId, score, startedAt, endedAt],
-        (err, attemptResult) => {
-          if (err) return res.status(500).json(err);
-          const attemptId = attemptResult.insertId;
-
-          // If no answers, just return success
-          if (!answers || answers.length === 0) {
-            return res.json({ msg: "Quiz submitted", attemptId });
-          }
-
-          // Insert user answers
-          // Build query and data for bulk insert
-          let sql =
-            "INSERT INTO user_answers ( user_id, attempt_id, question_id, selected_option, is_correct) VALUES ";
-          const values = [];
-          answers.forEach((ans, idx) => {
-            sql += "(?, ?, ?, ?, ?)" + (idx < answers.length - 1 ? ", " : "");
-            values.push(
-              userId,
-              attemptId,
-              ans.question_id,
-              ans.selected_option,
-              ans.is_correct
-            );
-          });
-          db.query(sql, values, (err2) => {
-            if (err2) {
-              console.error("Insert user_answers error:", err2);
-              return res
-                .status(500)
-                .json({ msg: "Insert user_answers error", error: err2 });
-            }
-            res.json({ msg: "Quiz submitted", attemptId });
-          });
-        }
-      );
+  try {
+    // Check attempts
+    const result = await pool.query(
+      "SELECT COUNT(*) AS cnt FROM quiz_attempts WHERE user_id=$1 AND topic_id=$2",
+      [userId, topicId]
+    );
+    const cnt = parseInt(result.rows[0].cnt, 10);
+    if (cnt >= 3) {
+      return res.status(403).json({ msg: "Maximum attempts reached" });
     }
-  );
+
+    // Insert attempt
+    const attemptResult = await pool.query(
+      "INSERT INTO quiz_attempts (user_id, topic_id, score, started_at, ended_at) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+      [userId, topicId, score, startedAt, endedAt]
+    );
+    const attemptId = attemptResult.rows[0].id;
+
+    // If no answers, just return success
+    if (!answers || answers.length === 0) {
+      return res.json({ msg: "Quiz submitted", attemptId });
+    }
+
+    // Insert user answers (bulk insert)
+    const values = [];
+    const params = [];
+    let paramIndex = 1;
+    answers.forEach((ans, idx) => {
+      values.push(
+        `($${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++})`
+      );
+      params.push(
+        userId,
+        attemptId,
+        ans.question_id,
+        ans.selected_option,
+        ans.is_correct
+      );
+    });
+    if (values.length > 0) {
+      const sql = `INSERT INTO user_answers (user_id, attempt_id, question_id, selected_option, is_correct) VALUES ${values.join(
+        ", "
+      )}`;
+      await pool.query(sql, params);
+    }
+    res.json({ msg: "Quiz submitted", attemptId });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
 // Get user attempts for admin
-exports.getUserAttempts = (req, res) => {
-  db.query(
-    `SELECT qa.*, u.name as user_name, t.title as topic_title
-     FROM quiz_attempts qa
-     JOIN users u ON qa.user_id = u.id
-     JOIN topics t ON qa.topic_id = t.id
-     ORDER BY qa.started_at DESC`,
-    (err, results) => {
-      if (err) return res.status(500).json(err);
-      res.json(results);
-    }
-  );
+exports.getUserAttempts = async (req, res) => {
+  try {
+    const result = await pool.query(
+      `SELECT qa.*, u.name as user_name, t.title as topic_title
+       FROM quiz_attempts qa
+       JOIN users u ON qa.user_id = u.id
+       JOIN topics t ON qa.topic_id = t.id
+       ORDER BY qa.started_at DESC`
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
 // Get remaining attempts for a user/topic
-exports.getRemainingAttempts = (req, res) => {
+exports.getRemainingAttempts = async (req, res) => {
   const userId = req.params.userId;
   const topicId = req.params.topicId;
-  db.query(
-    "SELECT COUNT(*) AS cnt FROM quiz_attempts WHERE user_id=? AND topic_id=?",
-    [userId, topicId],
-    (err, result) => {
-      if (err) return res.status(500).json(err);
-      db.query(
-        "SELECT max_attempts FROM topics WHERE id=?",
-        [topicId],
-        (err2, result2) => {
-          if (err2) return res.status(500).json(err2);
-          const maxAttempts = result2[0]?.max_attempts || 3;
-          res.json({ remaining: maxAttempts - result[0].cnt, maxAttempts });
-        }
-      );
-    }
-  );
+  try {
+    const result = await pool.query(
+      "SELECT COUNT(*) AS cnt FROM quiz_attempts WHERE user_id=$1 AND topic_id=$2",
+      [userId, topicId]
+    );
+    const cnt = parseInt(result.rows[0].cnt, 10);
+    const result2 = await pool.query(
+      "SELECT max_attempts FROM topics WHERE id=$1",
+      [topicId]
+    );
+    const maxAttempts = result2.rows[0]?.max_attempts || 3;
+    res.json({ remaining: maxAttempts - cnt, maxAttempts });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
-exports.getAllRemainingAttemptsForUser = (req, res) => {
+exports.getAllRemainingAttemptsForUser = async (req, res) => {
   const userId = req.params.userId;
-  db.query(
-    `SELECT t.id as topic_id, t.title, t.max_attempts,
-      (t.max_attempts - IFNULL(a.cnt,0)) as remaining_attempts
-     FROM topics t
-     LEFT JOIN (
-       SELECT topic_id, COUNT(*) as cnt
-       FROM quiz_attempts
-       WHERE user_id = ?
-       GROUP BY topic_id
-     ) a ON t.id = a.topic_id`,
-    [userId],
-    (err, results) => {
-      if (err) return res.status(500).json(err);
-      res.json(results);
-    }
-  );
+  try {
+    const result = await pool.query(
+      `SELECT t.id as topic_id, t.title, t.max_attempts,
+        (t.max_attempts - COALESCE(a.cnt,0)) as remaining_attempts
+       FROM topics t
+       LEFT JOIN (
+         SELECT topic_id, COUNT(*) as cnt
+         FROM quiz_attempts
+         WHERE user_id = $1
+         GROUP BY topic_id
+       ) a ON t.id = a.topic_id`,
+      [userId]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };

@@ -1,18 +1,19 @@
-const db = require("../config/db");
+const pool = require("../config/db");
 
-exports.getPracticeQuestionsByTopicId = (req, res) => {
+exports.getPracticeQuestionsByTopicId = async (req, res) => {
   const { topicId } = req.params;
-  db.query(
-    "SELECT * FROM practicequestions WHERE topic_id = ?",
-    [topicId],
-    (err, results) => {
-      if (err) return res.status(500).json(err);
-      res.json(results);
-    }
-  );
+  try {
+    const result = await pool.query(
+      "SELECT * FROM practicequestions WHERE topic_id = $1",
+      [topicId]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
-exports.addPracticeQuestionsToTopic = (req, res) => {
+exports.addPracticeQuestionsToTopic = async (req, res) => {
   const { topicId } = req.params;
   const {
     question_text,
@@ -23,32 +24,36 @@ exports.addPracticeQuestionsToTopic = (req, res) => {
     correct_option,
   } = req.body;
 
-  db.query(
-    "INSERT INTO practicequestions (topic_id, question_text, option_a, option_b, option_c, option_d, correct_option) VALUES (?, ?, ?, ?, ?, ?, ?)",
-    [
-      topicId,
-      question_text,
-      option_a,
-      option_b,
-      option_c,
-      option_d,
-      correct_option,
-    ],
-    (err) => {
-      if (err) return res.status(500).json(err);
-      res.json({ msg: "Question added" });
-    }
-  );
+  try {
+    await pool.query(
+      "INSERT INTO practicequestions (topic_id, question_text, option_a, option_b, option_c, option_d, correct_option) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+      [
+        topicId,
+        question_text,
+        option_a,
+        option_b,
+        option_c,
+        option_d,
+        correct_option,
+      ]
+    );
+    res.json({ msg: "Question added" });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
 
-exports.deletePracticeQuestions = (req, res) => {
+exports.deletePracticeQuestions = async (req, res) => {
   const { id } = req.params;
-  db.query("DELETE FROM practicequestions WHERE id = ?", [id], (err) => {
-    if (err) return res.status(500).json(err);
+  try {
+    await pool.query("DELETE FROM practicequestions WHERE id = $1", [id]);
     res.json({ msg: "Question deleted" });
-  });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
-exports.updatePracticeQuestions = (req, res) => {
+
+exports.updatePracticeQuestions = async (req, res) => {
   const id = req.params.id;
   const {
     question_text,
@@ -58,12 +63,21 @@ exports.updatePracticeQuestions = (req, res) => {
     option_d,
     correct_option,
   } = req.body;
-  db.query(
-    `UPDATE practicequestions SET question_text=?, option_a=?, option_b=?, option_c=?, option_d=?, correct_option=? WHERE id=?`,
-    [question_text, option_a, option_b, option_c, option_d, correct_option, id],
-    (err, result) => {
-      if (err) return res.status(500).json(err);
-      res.json({ message: "Question updated" });
-    }
-  );
+  try {
+    await pool.query(
+      `UPDATE practicequestions SET question_text=$1, option_a=$2, option_b=$3, option_c=$4, option_d=$5, correct_option=$6 WHERE id=$7`,
+      [
+        question_text,
+        option_a,
+        option_b,
+        option_c,
+        option_d,
+        correct_option,
+        id,
+      ]
+    );
+    res.json({ message: "Question updated" });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 };
