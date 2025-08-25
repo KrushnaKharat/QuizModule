@@ -28,9 +28,12 @@ function UserDashboard() {
     if (userId) {
       setLoading(true);
       axios
-        .get(`https://quizmodule.onrender.com/api/auth/users/${userId}/courses`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        .get(
+          `https://quizmodule.onrender.com/api/auth/users/${userId}/courses`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
         .then((res) =>
           setQuizzes(res.data.map((c) => ({ ...c, id: Number(c.id) })))
         )
@@ -44,9 +47,12 @@ function UserDashboard() {
     if (selectedCourse) {
       setLoading(true);
       axios
-        .get(`https://quizmodule.onrender.com/api/course/${selectedCourse.id}/topics`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        .get(
+          `https://quizmodule.onrender.com/api/course/${selectedCourse.id}/topics`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
         .then((res) => setTopics(res.data))
         .catch(() => setError("Failed to fetch topics."))
         .finally(() => setLoading(false));
@@ -73,6 +79,12 @@ function UserDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-4xl font-bold text-indigo-700">Your Courses</h1>
+        <div className=" text-lg font-bold rounded-lg px-2 py-2 bg-indigo-100 text-indigo-700 text-center shadow">
+          Mr. Prajyot Patil{" "}
+          <span className="font-normal text-indigo-600">
+            Founder &amp; CEO, AIS Solutions Pvt. Ltd.
+          </span>
+        </div>
         <button
           onClick={handleLogout}
           className="bg-red-500 text-white px-4 py-2 rounded"

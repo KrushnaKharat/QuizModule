@@ -430,6 +430,15 @@ function QuizPage() {
               );
             })}
           </div>
+
+          <div>
+            <div className="mt-6 text-lg font-bold rounded-lg px-3 py-2 bg-indigo-100 text-indigo-700 text-center shadow">
+              Mr. Prajyot Patil <br />
+              <span className="font-normal text-indigo-600">
+                Founder &amp; CEO, <br /> AIS Solutions Pvt. Ltd.
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
