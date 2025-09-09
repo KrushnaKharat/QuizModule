@@ -11,6 +11,8 @@ function UserDashboard() {
   const token = localStorage.getItem("token");
   const [userId, setUserId] = useState(null);
 
+  const [userName, setUserName] = useState("");
+
   // Get userId as in QuizPage.jsx
   useEffect(() => {
     if (token) {
@@ -18,8 +20,14 @@ function UserDashboard() {
         .get("https://quizmodule.onrender.com/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         })
-        .then((res) => setUserId(res.data.id))
-        .catch(() => setUserId(null));
+        .then((res) => {
+          setUserId(res.data.id);
+          setUserName(res.data.name); // <-- set the name here
+        })
+        .catch(() => {
+          setUserId(null);
+          setUserName("");
+        });
     }
   }, [token]);
 
@@ -76,21 +84,35 @@ function UserDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-4xl font-bold text-indigo-700">Your Courses</h1>
-        <div className=" text-lg font-bold rounded-lg px-2 py-2 bg-indigo-100 text-indigo-700 text-center shadow">
-          Mr. Prajyot Patil{" "}
-          <span className="font-normal text-indigo-600">
-            Founder &amp; CEO, AIS Solutions Pvt. Ltd.
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white pl-6 pr-6 ">
+      <div className="flex items-center justify-between mb-8 border-b-4 border-purple-600 py-4 px-2 rounded-xl shadow">
+        {/* Logo and Brand */}
+        <div className="flex items-center ">
+          <img
+            className="h-16 w-16 object-contain"
+            src="/pictures/logo.png"
+            alt="Company Logo"
+          />
+          <span className=" text-lg text-indigo-800 font-bold  ">
+            Applied InSights
           </span>
         </div>
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-2 rounded"
-        >
-          Logout
-        </button>
+        {/* Title */}
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-indigo-700 text-center flex-1">
+          Your Courses
+        </h1>
+        {/* User Name and Logout */}
+        <div className="flex items-center gap-4">
+          <span className="text-indigo-700 font-semibold text-lg">
+            {userName && `Hi, ${userName}`}
+          </span>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 hover:bg-red-600 transition text-white px-6 py-2 rounded-lg font-semibold shadow"
+          >
+            Logout
+          </button>
+        </div>
       </div>
       {error && <div className="text-red-600 mb-4">{error}</div>}
       {loading && <div className="text-blue-700 mb-4">Loading...</div>}

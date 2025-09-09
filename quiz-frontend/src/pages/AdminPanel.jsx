@@ -57,9 +57,12 @@ function AdminPanel() {
   useEffect(() => {
     if (showScore) {
       axios
-        .get("https://quizmodule.onrender.com/api/attempts/admin/attempts/aggregated", {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        .get(
+          "https://quizmodule.onrender.com/api/attempts/admin/attempts/aggregated",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
         .then((res) => setAttemptScores(res.data));
     }
   }, [showScore, token]);
@@ -224,8 +227,8 @@ function AdminPanel() {
           </div>
         </div>
       </div>
-      <div className="ml-2 w-3/4">
-        <div className="flex justify-between items-center mb-6 ">
+      <div className="ml-2 w-3/4  ">
+        <div className="flex justify-between items-center mb-6 mt-10">
           <h2 className="text-3xl font-bold text-indigo-700">Admin Panel</h2>
           <button
             onClick={() => {
