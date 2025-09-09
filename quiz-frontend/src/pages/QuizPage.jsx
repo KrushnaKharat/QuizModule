@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import "./QuizPage.css";
@@ -11,6 +11,9 @@ function QuizPage() {
 
   const [maxAttempts, setMaxAttempts] = useState(3);
   const [resultCurrent, setResultCurrent] = useState(0);
+
+  const answersRef = useRef({});
+  const submitOnceRef = useRef(false); // <--- Prevent double submit
 
   const { quizId } = useParams();
   const [questions, setQuestions] = useState([]);
@@ -95,6 +98,11 @@ function QuizPage() {
       });
   }, [quizId, token]);
 
+  // Keep answersRef in sync
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
   // Timer effect
   useEffect(() => {
     if (!showInstructions && timer && !submitted && !isSubmitting) {
@@ -131,13 +139,14 @@ function QuizPage() {
   };
 
   const handleSubmit = async () => {
-    if (submitted || isSubmitting) return; // Prevent double submit
+    if (submitted || isSubmitting || submitOnceRef.current) return; // Prevent double submit
     setIsSubmitting(true);
+    submitOnceRef.current = true;
 
-    // Allow submission even if not all questions are answered (for timer auto-submit)
+    // Calculate score: only correct selected options
     let scoreVal = 0;
     const answerArr = questions.map((q) => {
-      const selected = answers[q.id];
+      const selected = answersRef.current[q.id];
       const correct = selected && selected === q.correct_option;
       if (correct) scoreVal++;
       return {
