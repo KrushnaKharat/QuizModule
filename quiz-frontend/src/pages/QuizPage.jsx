@@ -4,6 +4,11 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import "./QuizPage.css";
 
 function QuizPage() {
+  const [showInstructions, setShowInstructions] = useState(true);
+  const [timer, setTimer] = useState(null); // in seconds
+  const [timeLeft, setTimeLeft] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [maxAttempts, setMaxAttempts] = useState(3);
   const [resultCurrent, setResultCurrent] = useState(0);
 
@@ -24,6 +29,7 @@ function QuizPage() {
   const token = localStorage.getItem("token");
   const isPractice = location.pathname.startsWith("/practicequiz");
 
+  // Fetch questions
   useEffect(() => {
     setLoading(true);
 
@@ -72,6 +78,42 @@ function QuizPage() {
     // eslint-disable-next-line
   }, [quizId, location.pathname]);
 
+  // Fetch topic timer
+  useEffect(() => {
+    axios
+      .get(`https://quizmodule.onrender.com/api/course/topic/${quizId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        // Assume res.data.timer is in minutes, convert to seconds
+        setTimer(res.data.timer * 60);
+        setTimeLeft(res.data.timer * 60);
+      })
+      .catch(() => {
+        setTimer(10 * 60); // fallback 10 min
+        setTimeLeft(10 * 60);
+      });
+  }, [quizId, token]);
+
+  // Timer effect
+  useEffect(() => {
+    if (!showInstructions && timer && !submitted && !isSubmitting) {
+      setTimeLeft(timer);
+      const interval = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            handleSubmit(); // auto-submit
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+    // eslint-disable-next-line
+  }, [showInstructions, timer, submitted, isSubmitting]);
+
   const handleAnswer = (qid, opt) => {
     setAnswers({ ...answers, [qid]: opt });
   };
@@ -89,22 +131,19 @@ function QuizPage() {
   };
 
   const handleSubmit = async () => {
-    const isAllAnswered = questions.every((q) => answers[q.id]);
+    if (submitted || isSubmitting) return; // Prevent double submit
+    setIsSubmitting(true);
 
-    if (!isAllAnswered) {
-      alert("Please answer all questions before submitting.");
-      return;
-    }
-
+    // Allow submission even if not all questions are answered (for timer auto-submit)
     let scoreVal = 0;
     const answerArr = questions.map((q) => {
       const selected = answers[q.id];
-      const correct = selected === q.correct_option;
+      const correct = selected && selected === q.correct_option;
       if (correct) scoreVal++;
       return {
         question_id: q.id,
-        selected_option: selected,
-        is_correct: correct,
+        selected_option: selected || null,
+        is_correct: !!correct,
       };
     });
 
@@ -112,6 +151,7 @@ function QuizPage() {
 
     if (isPractice) {
       setSubmitted(true);
+      setIsSubmitting(false);
       return;
     }
 
@@ -147,17 +187,38 @@ function QuizPage() {
           "Failed to submit quiz. Maybe you reached max attempts."
       );
       setSubmitted(false);
-      console.log({
-        topicId: quizId,
-        answers: answerArr,
-        score: scoreVal,
-      });
     }
+    setIsSubmitting(false);
   };
 
   if (loading) return <div className="text-center p-10">Loading quiz...</div>;
   if (error)
     return <div className="text-center p-10 text-red-500">{error}</div>;
+
+  // Show instructions popup before quiz starts
+  if (showInstructions) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-lg w-full text-center">
+          <h2 className="text-2xl font-bold mb-4 text-indigo-700">
+            Quiz Instructions
+          </h2>
+          <ul className="text-left mb-6 list-disc list-inside text-gray-700">
+            <li>Answer all questions within the time limit.</li>
+            <li>Once you start, the timer will not pause.</li>
+            <li>You cannot retake the quiz after max attempts.</li>
+            <li>Quiz will auto-submit when time is up.</li>
+          </ul>
+          <button
+            className="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700"
+            onClick={() => setShowInstructions(false)}
+          >
+            I Understand
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Show result after submit
   if (submitted) {
@@ -225,14 +286,14 @@ function QuizPage() {
                   <div
                     key={opt.key}
                     className={`flex items-center gap-2 px-3 py-2 rounded border
-                    ${
-                      isSelected
-                        ? isCorrect
-                          ? "bg-green-100 border-green-400"
-                          : "bg-red-100 border-red-400"
-                        : "bg-gray-50 border-gray-200"
-                    }
-                  `}
+        ${
+          isSelected
+            ? isCorrect
+              ? "bg-green-100 border-green-400"
+              : "bg-red-100 border-red-400"
+            : "bg-gray-50 border-gray-200"
+        }
+      `}
                   >
                     <span
                       className={`font-bold ${
@@ -275,6 +336,11 @@ function QuizPage() {
                   </div>
                 );
               })}
+              {!currentResult.selected && (
+                <div className="text-red-600 font-semibold mt-2">
+                  Not Answered
+                </div>
+              )}
             </div>
           </div>
           <div className="flex justify-between w-full mt-2">
@@ -307,19 +373,25 @@ function QuizPage() {
       <div className="flex w-full max-w-6xl">
         {/* Left Sidebar */}
         <div className="bg-indigo-100 rounded-l-xl p-8 flex flex-col items-center justify-center w-1/4">
-          <div className="text-xl font-bold text-indigo-700 mb-2">Question</div>
-          <div className="text-4xl font-extrabold text-indigo-600">
-            {current + 1}
-          </div>
-          <div className="text-lg text-indigo-500 mt-2">
-            of {questions.length}
-          </div>
-          {/* Progress Bar */}
-          <div className="w-full mt-6 h-2 bg-indigo-300 rounded">
-            <div
-              className="h-2 bg-indigo-700 rounded"
-              style={{ width: `${((current + 1) / questions.length) * 100}%` }}
-            />
+          <div className="w-full flex flex-col items-center justify-between">
+            <div className="text-xl font-bold text-indigo-700 mb-2">
+              Question
+            </div>
+            <div className="text-4xl font-extrabold text-indigo-600">
+              {current + 1}
+            </div>
+            <div className="text-lg text-indigo-500 mt-2">
+              of {questions.length}
+            </div>
+            {/* Progress Bar */}
+            <div className="w-full mt-6 h-2 bg-indigo-300 rounded">
+              <div
+                className="h-2 bg-indigo-700 rounded"
+                style={{
+                  width: `${((current + 1) / questions.length) * 100}%`,
+                }}
+              />
+            </div>
           </div>
         </div>
 
@@ -328,15 +400,29 @@ function QuizPage() {
           <h2 className="text-3xl font-bold text-center mb-8 text-indigo-700">
             Quiz
           </h2>
-          {!isPractice && (
-            <div className="mb-4 text-md text-gray-700">
-              Remaining Attempts:{" "}
-              <span className="font-bold text-indigo-700">
-                {remainingAttempts !== null ? remainingAttempts : "Loading..."}/
-                {maxAttempts}
-              </span>
+          <div className="flex justify-between items-center mb-4">
+            <div>
+              {!isPractice && (
+                <span className="text-md text-gray-700">
+                  Remaining Attempts:{" "}
+                  <span className="font-bold text-indigo-700">
+                    {remainingAttempts !== null
+                      ? remainingAttempts
+                      : "Loading..."}
+                    /{maxAttempts}
+                  </span>
+                </span>
+              )}
             </div>
-          )}
+            <div className="text-lg font-bold text-red-600">
+              Time Left:{" "}
+              {timeLeft !== null
+                ? `${Math.floor(timeLeft / 60)}:${String(
+                    timeLeft % 60
+                  ).padStart(2, "0")}`
+                : "--:--"}
+            </div>
+          </div>
           <div className="mb-8 p-6 rounded-lg bg-indigo-50 shadow">
             <p className="font-semibold text-lg mb-4 text-indigo-800">
               {q.question_text}

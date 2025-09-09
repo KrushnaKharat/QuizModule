@@ -87,16 +87,18 @@ function Users({ token }) {
 
   const handleAdd = (e) => {
     e.preventDefault();
-    axios.post("https://quizmodule.onrender.com/api/auth/register", newUser).then(() => {
-      setNewUser({
-        name: "",
-        email: "",
-        password: "",
-        role: "user",
-        courses: [],
+    axios
+      .post("https://quizmodule.onrender.com/api/auth/register", newUser)
+      .then(() => {
+        setNewUser({
+          name: "",
+          email: "",
+          password: "",
+          role: "user",
+          courses: [],
+        });
+        fetchUsers();
       });
-      fetchUsers();
-    });
   };
 
   // Multi-select handler for add
@@ -118,9 +120,12 @@ function Users({ token }) {
   // Open edit modal and fetch user's courses
   const openEditModal = (user) => {
     axios
-      .get(`https://quizmodule.onrender.com/api/auth/users/${user.id}/courses`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .get(
+        `https://quizmodule.onrender.com/api/auth/users/${user.id}/courses`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
       .then((res) => {
         setEditUser({
           id: user.id,

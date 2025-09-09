@@ -28,9 +28,12 @@ function UserDashboard() {
     if (userId) {
       setLoading(true);
       axios
-        .get(`https://quizmodule.onrender.com/api/auth/users/${userId}/courses`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        .get(
+          `https://quizmodule.onrender.com/api/auth/users/${userId}/courses`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
         .then((res) =>
           setQuizzes(res.data.map((c) => ({ ...c, id: Number(c.id) })))
         )
@@ -44,9 +47,12 @@ function UserDashboard() {
     if (selectedCourse) {
       setLoading(true);
       axios
-        .get(`https://quizmodule.onrender.com/api/course/${selectedCourse.id}/topics`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        .get(
+          `https://quizmodule.onrender.com/api/course/${selectedCourse.id}/topics`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
         .then((res) => setTopics(res.data))
         .catch(() => setError("Failed to fetch topics."))
         .finally(() => setLoading(false));
@@ -143,19 +149,23 @@ function UserDashboard() {
                   <p className="text-sm text-gray-700">
                     Start your quiz on this topic.
                   </p>
-                  <div
-                    className="mt-2 text-indigo-600 font-medium underline cursor-pointer"
-                    onClick={() => (window.location.href = `/quiz/${topic.id}`)}
-                  >
-                    Start Quiz →
-                  </div>
-                  <div
-                    className="mt-2 text-indigo-600 font-medium underline cursor-pointer"
-                    onClick={() =>
-                      (window.location.href = `/practicequiz/${topic.id}`)
-                    }
-                  >
-                    Start Practice Quiz →
+                  <div className="flex justify-between">
+                    <div
+                      className="mt-2 text-indigo-600 font-medium underline cursor-pointer"
+                      onClick={() =>
+                        (window.location.href = `/quiz/${topic.id}`)
+                      }
+                    >
+                      Start Quiz →
+                    </div>
+                    <div
+                      className="mt-2 text-blue-500 font-medium underline cursor-pointer"
+                      onClick={() =>
+                        (window.location.href = `/practicequiz/${topic.id}`)
+                      }
+                    >
+                      Start Practice Quiz →
+                    </div>
                   </div>
                 </div>
               ))}

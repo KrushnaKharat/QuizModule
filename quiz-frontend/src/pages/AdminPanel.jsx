@@ -7,6 +7,9 @@ import Questions from "./Admin/Questions";
 
 function AdminPanel() {
   const [showUsers, setShowUsers] = useState(false);
+
+  const [attemptScores, setAttemptScores] = useState([]);
+
   const [showScore, setShowScore] = useState(false);
   const [attempts, setAttempts] = useState([]);
   const [userName, setUserName] = useState("");
@@ -54,10 +57,10 @@ function AdminPanel() {
   useEffect(() => {
     if (showScore) {
       axios
-        .get("https://quizmodule.onrender.com/api/attempts/admin/attempts", {
+        .get("https://quizmodule.onrender.com/api/attempts/admin/attempts/aggregated", {
           headers: { Authorization: `Bearer ${token}` },
         })
-        .then((res) => setAttempts(res.data));
+        .then((res) => setAttemptScores(res.data));
     }
   }, [showScore, token]);
 
@@ -86,43 +89,71 @@ function AdminPanel() {
                 User
               </th>
               <th className="py-3 px-4 text-left font-semibold text-indigo-700">
+                Course
+              </th>
+              <th className="py-3 px-4 text-left font-semibold text-indigo-700">
                 Topic
               </th>
               <th className="py-3 px-4 text-left font-semibold text-indigo-700">
-                Score
+                First Attempt
               </th>
               <th className="py-3 px-4 text-left font-semibold text-indigo-700">
-                Started
+                Second Attempt
               </th>
               <th className="py-3 px-4 text-left font-semibold text-indigo-700">
-                Ended
+                Third Attempt
+              </th>
+              <th className="py-3 px-4 text-left font-semibold text-indigo-700">
+                Best Score
               </th>
             </tr>
           </thead>
           <tbody>
-            {attempts.length === 0 ? (
+            {attemptScores.length === 0 ? (
               <tr>
-                <td colSpan={5} className="py-6 text-center text-gray-500">
+                <td colSpan={7} className="py-6 text-center text-gray-500">
                   No attempts found.
                 </td>
               </tr>
             ) : (
-              attempts.map((a) => (
-                <tr key={a.id} className="hover:bg-indigo-50 transition">
+              attemptScores.map((a, idx) => (
+                <tr key={idx} className="hover:bg-indigo-50 transition">
                   <td className="py-2 px-4 border-b border-gray-100">
                     {a.user_name}
                   </td>
                   <td className="py-2 px-4 border-b border-gray-100">
+                    {a.course_title}
+                  </td>
+                  <td className="py-2 px-4 border-b border-gray-100">
                     {a.topic_title}
                   </td>
+                  <td className="py-2 px-4 border-b border-gray-100">
+                    {a.first_attempt !== null ? (
+                      a.first_attempt
+                    ) : (
+                      <span className="text-gray-400">Not attempted yet</span>
+                    )}
+                  </td>
+                  <td className="py-2 px-4 border-b border-gray-100">
+                    {a.second_attempt !== null ? (
+                      a.second_attempt
+                    ) : (
+                      <span className="text-gray-400">Not attempted yet</span>
+                    )}
+                  </td>
+                  <td className="py-2 px-4 border-b border-gray-100">
+                    {a.third_attempt !== null ? (
+                      a.third_attempt
+                    ) : (
+                      <span className="text-gray-400">Not attempted yet</span>
+                    )}
+                  </td>
                   <td className="py-2 px-4 border-b border-gray-100 font-bold text-green-700">
-                    {a.score}
-                  </td>
-                  <td className="py-2 px-4 border-b border-gray-100">
-                    {a.started_at}
-                  </td>
-                  <td className="py-2 px-4 border-b border-gray-100">
-                    {a.ended_at}
+                    {a.best_score !== null ? (
+                      a.best_score
+                    ) : (
+                      <span className="text-gray-400">Not attempted yet</span>
+                    )}
                   </td>
                 </tr>
               ))
@@ -136,9 +167,9 @@ function AdminPanel() {
   return (
     <div className="min-h-screen w-full flex bg-gray-50 overflow-hidden">
       <div className="w-1/5 bg-gray-500 flex flex-col p-4 gap-12 text-white align-middle text-lg">
-        <div className="w-1/5 bg-gray-500 flex flex-col p-4 gap-12 text-white align-middle text-lg">
+        <div className="w-full bg-gray-500 flex flex-col p-4 gap-12 text-white align-middle text-lg">
           <div className="text-center">
-            <h2>Hii.. {userName}</h2>
+            <h2>{userName}</h2>
             <p className="text-sm mt-2">{userEmail}</p>
           </div>
           <div className="flex flex-col text-center">
@@ -176,7 +207,7 @@ function AdminPanel() {
                 setShowQuestions(false);
               }}
             >
-              Students
+              Users
             </a>
             <a
               href="#"
@@ -189,18 +220,6 @@ function AdminPanel() {
               }}
             >
               Scores
-            </a>
-            <a
-              href="#"
-              className="p-4"
-              onClick={() => {
-                setShowUsers(false);
-                setShowTopics(false);
-                setShowScore(false);
-                setShowQuestions(true);
-              }}
-            >
-              Add Questions
             </a>
           </div>
         </div>

@@ -114,3 +114,32 @@ exports.getAllRemainingAttemptsForUser = async (req, res) => {
     res.status(500).json(err);
   }
 };
+
+exports.getUserAttemptsAggregated = async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        u.name as user_name,
+        t.title as topic_title,
+        c.title as course_title,
+        MAX(CASE WHEN rn = 1 THEN qa.score END) as first_attempt,
+        MAX(CASE WHEN rn = 2 THEN qa.score END) as second_attempt,
+        MAX(CASE WHEN rn = 3 THEN qa.score END) as third_attempt,
+        MAX(qa.score) as best_score
+      FROM users u
+      JOIN quiz_attempts qa ON qa.user_id = u.id
+      JOIN topics t ON qa.topic_id = t.id
+      JOIN courses c ON t.course_id = c.id
+      JOIN (
+        SELECT id, user_id, topic_id,
+          ROW_NUMBER() OVER (PARTITION BY user_id, topic_id ORDER BY started_at ASC) as rn
+        FROM quiz_attempts
+      ) ranked ON ranked.id = qa.id
+      GROUP BY u.name, t.title, c.title, qa.user_id, qa.topic_id
+      ORDER BY u.name, c.title, t.title
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
