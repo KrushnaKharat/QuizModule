@@ -155,19 +155,23 @@ function UserDashboard() {
                   <p className="text-sm text-gray-700">
                     Start your quiz on this topic.
                   </p>
-                  <div
-                    className="mt-2 text-indigo-600 font-medium underline cursor-pointer"
-                    onClick={() => (window.location.href = `/quiz/${topic.id}`)}
-                  >
-                    Start Quiz →
-                  </div>
-                  <div
-                    className="mt-2 text-indigo-600 font-medium underline cursor-pointer"
-                    onClick={() =>
-                      (window.location.href = `/practicequiz/${topic.id}`)
-                    }
-                  >
-                    Start Practice Quiz →
+                  <div className="flex justify-between">
+                    <div
+                      className="mt-2 text-indigo-600 font-medium underline cursor-pointer"
+                      onClick={() =>
+                        (window.location.href = `/quiz/${topic.id}`)
+                      }
+                    >
+                      Start Quiz →
+                    </div>
+                    <div
+                      className="mt-2 text-blue-500 font-medium underline cursor-pointer"
+                      onClick={() =>
+                        (window.location.href = `/practicequiz/${topic.id}`)
+                      }
+                    >
+                      Start Practice Quiz →
+                    </div>
                   </div>
                 </div>
               ))}
