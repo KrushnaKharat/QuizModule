@@ -13,10 +13,13 @@ function Login() {
   const handleLogin = async () => {
     setErrorMsg("");
     try {
-      const res = await axios.post("https://quizmodule.onrender.com/api/auth/login", {
-        email,
-        password,
-      });
+      const res = await axios.post(
+        "https://quizmodule.onrender.com/api/auth/login",
+        {
+          email,
+          password,
+        }
+      );
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);
       localStorage.setItem("user", JSON.stringify(res.data.user)); // Save user info if returned
