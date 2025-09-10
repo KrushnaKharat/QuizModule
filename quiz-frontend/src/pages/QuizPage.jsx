@@ -4,6 +4,7 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import "./QuizPage.css";
 
 function QuizPage() {
+  const [topicTitle, setTopicTitle] = useState("");
   const [showInstructions, setShowInstructions] = useState(true);
   const [timer, setTimer] = useState(null); // in seconds
   const [timeLeft, setTimeLeft] = useState(null);
@@ -89,10 +90,12 @@ function QuizPage() {
       })
       .then((res) => {
         // Assume res.data.timer is in minutes, convert to seconds
+        setTopicTitle(res.data.title || "");
         setTimer(res.data.timer * 60);
         setTimeLeft(res.data.timer * 60);
       })
       .catch(() => {
+        setTopicTitle("");
         setTimer(10 * 60); // fallback 10 min
         setTimeLeft(10 * 60);
       });
@@ -373,6 +376,27 @@ function QuizPage() {
     );
   }
 
+  if (!loading && !isPractice && remainingAttempts === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200">
+        <div className="bg-white shadow-lg rounded-xl px-8 py-10 w-full max-w-md flex flex-col items-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">
+            No Attempts Left
+          </h2>
+          <p className="text-lg text-gray-700 mb-6">
+            You have used all your attempts for this quiz topic.
+          </p>
+          <button
+            className="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700"
+            onClick={() => navigate("/dashboard")}
+          >
+            Back to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const q = questions[current];
   const isAllAnswered =
     questions.length > 0 && questions.every((q) => answers[q.id]);
@@ -382,6 +406,13 @@ function QuizPage() {
       <div className="flex w-full max-w-6xl">
         {/* Left Sidebar */}
         <div className="bg-indigo-100 rounded-l-xl p-8 flex flex-col items-center justify-center w-1/4">
+          <div className="w-full flex flex-col items-center justify-center mb-4">
+            {topicTitle && (
+              <div className="text-xl font-bold text-indigo-700 mb-2 flex flex-col justify-center items-center">
+                <span>Topic : </span> <span> {topicTitle}</span>
+              </div>
+            )}
+          </div>
           <div className="w-full flex flex-col items-center justify-between">
             <div className="text-xl font-bold text-indigo-700 mb-2">
               Question
@@ -409,6 +440,7 @@ function QuizPage() {
           <h2 className="text-3xl font-bold text-center mb-8 text-indigo-700">
             Quiz
           </h2>
+
           <div className="flex justify-between items-center mb-4">
             <div>
               {!isPractice && (
@@ -501,38 +533,44 @@ function QuizPage() {
         </div>
 
         {/* Right Sidebar for Question Navigation */}
-        <div className="bg-indigo-50 rounded-r-xl p-6 w-1/4 flex flex-col items-center justify-start">
-          <h3 className="text-indigo-700 text-lg font-bold mb-4">Questions</h3>
-          <div className="grid grid-cols-4 gap-2">
-            {questions.map((qItem, index) => {
-              const isCurrent = current === index;
-              const isAnswered = answers[qItem.id];
-              const isSkipped = index < current && !isAnswered;
+        <div className="bg-indigo-50 rounded-r-xl p-6 w-1/4 flex flex-col items-center justify-between">
+          <div>
+            <h3 className="text-indigo-700 text-lg text-center font-bold mb-4">
+              Questions
+            </h3>
+            <div className="grid grid-cols-4 gap-2">
+              {questions.map((qItem, index) => {
+                const isCurrent = current === index;
+                const isAnswered = answers[qItem.id];
+                const isSkipped = index < current && !isAnswered;
 
-              let bgColor = "bg-gray-200 text-gray-700";
-              if (isCurrent) bgColor = "bg-blue-500 text-white";
-              else if (isAnswered) bgColor = "bg-green-500 text-white";
-              else if (isSkipped) bgColor = "bg-red-500 text-white";
+                let bgColor = "bg-gray-200 text-gray-700";
+                if (isCurrent) bgColor = "bg-blue-500 text-white";
+                else if (isAnswered) bgColor = "bg-green-500 text-white";
+                else if (isSkipped) bgColor = "bg-red-500 text-white";
 
-              return (
-                <div
-                  key={qItem.id}
-                  className={`w-10 h-10 flex items-center justify-center rounded-full font-semibold cursor-pointer ${bgColor}`}
-                  onClick={() => setCurrent(index)}
-                >
-                  {index + 1}
-                </div>
-              );
-            })}
+                return (
+                  <div
+                    key={qItem.id}
+                    className={`w-10 h-10 flex items-center justify-center rounded-full font-semibold cursor-pointer ${bgColor}`}
+                    onClick={() => setCurrent(index)}
+                  >
+                    {index + 1}
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          <div>
-            <div className="mt-6 text-lg font-bold rounded-lg px-3 py-2 bg-indigo-100 text-indigo-700 text-center shadow">
-              Mr. Prajyot Patil <br />
-              <span className="font-normal text-indigo-600">
-                Founder &amp; CEO, <br /> AIS Solutions Pvt. Ltd.
-              </span>
-            </div>
+          <div className="flex flex-col items-center p-2 rounded-sm gap-2">
+            <img
+              className="h-24 w-fit object-contain rounded-full shadow-md shadow-indigo-500"
+              src="/pictures/logo.png"
+              alt="Company Logo"
+            />
+            <span className=" text-lg text-indigo-800 font-bold  ">
+              Applied InSights
+            </span>
           </div>
         </div>
       </div>
