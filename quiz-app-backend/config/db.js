@@ -12,4 +12,11 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false },
 });
 
+setInterval(() => {
+  pool.query("SELECT 1").catch((err) => {
+    console.log(err);
+  });
+  console.log("Querry sended");
+}, 60 * 60 * 1000);
+
 module.exports = pool;
