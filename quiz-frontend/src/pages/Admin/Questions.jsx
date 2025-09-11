@@ -5,11 +5,15 @@ import axios from "axios";
 function Questions({ topicId, token, onBack, type = "questions" }) {
   const [importFile, setImportFile] = useState(null);
   const [importType, setImportType] = useState("");
+
+  const [importLoading, setImportLoading] = useState(false);
+
   const handleImport = async () => {
     if (!importFile || !importType) return;
     const formData = new FormData();
     formData.append("file", importFile);
 
+    setImportLoading(true); // Start loading
     try {
       await axios.post(
         `https://quizmodule.onrender.com/api/topics/${topicId}/import`,
@@ -28,6 +32,7 @@ function Questions({ topicId, token, onBack, type = "questions" }) {
     } catch (err) {
       alert("Failed to import questions");
     }
+    setImportLoading(false); // End loading
   };
 
   const [questions, setQuestions] = useState([]);
@@ -58,7 +63,6 @@ function Questions({ topicId, token, onBack, type = "questions" }) {
     } catch (err) {
       alert("Failed to fetch questions");
     }
-    
   };
 
   const handleAddQuestion = async () => {
@@ -89,7 +93,7 @@ function Questions({ topicId, token, onBack, type = "questions" }) {
       <button className="mb-4 text-blue-600 underline" onClick={onBack}>
         &larr; Back to Topics
       </button>
-      <h3 className="text-xl font-semibold mb-4">Questions   </h3>
+      <h3 className="text-xl font-semibold mb-4">Questions </h3>
       <input
         className="border p-2 rounded w-full"
         placeholder="Question text"
@@ -168,9 +172,9 @@ function Questions({ topicId, token, onBack, type = "questions" }) {
           <button
             className="bg-green-600 text-white px-4 py-2 rounded"
             onClick={handleImport}
-            disabled={!importFile || !importType}
+            disabled={!importFile || !importType || importLoading}
           >
-            Import
+            {importLoading ? "Importing..." : "Import"}
           </button>
         </div>
       </div>
