@@ -263,20 +263,20 @@ function UserDashboard() {
                     </div>
                     <div className="flex justify-between mt-2">
                       <div
-                        className="text-indigo-600 font-medium underline cursor-pointer"
-                        onClick={() =>
-                          (window.location.href = `/quiz/${topic.id}`)
-                        }
-                      >
-                        Start Quiz →
-                      </div>
-                      <div
                         className="text-blue-500 font-medium underline cursor-pointer"
                         onClick={() =>
                           (window.location.href = `/practicequiz/${topic.id}`)
                         }
                       >
                         Start Practice Quiz →
+                      </div>
+                      <div
+                        className="text-indigo-600 font-medium underline cursor-pointer"
+                        onClick={() =>
+                          (window.location.href = `/quiz/${topic.id}`)
+                        }
+                      >
+                        Start Quiz →
                       </div>
                     </div>
                   </div>

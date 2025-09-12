@@ -19,7 +19,7 @@ function AdminPanel() {
   const [questionsTopicId, setQuestionsTopicId] = useState(null);
   const [questionsType, setQuestionsType] = useState("questions");
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortByBestScore, setSortByBestScore] = useState(false);
+  const [sortByBestScore, setSortByBestScore] = useState(""); // "", "asc", "desc"
 
   const handleAddQuestions = (topicId) => {
     setQuestionsTopicId(topicId);
@@ -76,10 +76,13 @@ function AdminPanel() {
     setTopicsCourseId(null);
   };
 
-  // Sort by best score or latest topic quiz result first (descending)
-  // Replace 'created_at' with your actual timestamp field if needed
+  // Sorting logic: default (""), then asc/desc on click
   let sortedScores = attemptScores.slice();
-  if (sortByBestScore) {
+  if (sortByBestScore === "asc") {
+    sortedScores = sortedScores.sort(
+      (a, b) => (a.best_score ?? 0) - (b.best_score ?? 0)
+    );
+  } else if (sortByBestScore === "desc") {
     sortedScores = sortedScores.sort(
       (a, b) => (b.best_score ?? 0) - (a.best_score ?? 0)
     );
@@ -96,6 +99,14 @@ function AdminPanel() {
       a.user_email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       a.topic_title?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleSortClick = () => {
+    setSortByBestScore((prev) => {
+      if (prev === "") return "desc";
+      if (prev === "desc") return "asc";
+      return "desc";
+    });
+  };
 
   const Scores = (
     <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
@@ -135,11 +146,23 @@ function AdminPanel() {
               </th>
               <th
                 className="py-3 px-4 text-left font-semibold text-indigo-700 cursor-pointer flex items-center gap-2 select-none"
-                onClick={() => setSortByBestScore((prev) => !prev)}
+                onClick={handleSortClick}
               >
                 Best Score
                 <span>
-                  {sortByBestScore ? (
+                  {sortByBestScore === "desc" ? (
+                    // Down arrow
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+                      <path
+                        d="M7 10l5 5 5-5"
+                        stroke="#4F46E5"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  ) : sortByBestScore === "asc" ? (
+                    // Up arrow
                     <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
                       <path
                         d="M7 14l5-5 5 5"
@@ -150,6 +173,7 @@ function AdminPanel() {
                       />
                     </svg>
                   ) : (
+                    // Neutral (gray up arrow)
                     <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
                       <path
                         d="M7 14l5-5 5 5"
