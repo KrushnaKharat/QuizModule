@@ -2,14 +2,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Users from "./Users";
 import Courses from "./Admin/Courses";
-import Topics from "./Admin/Topics"; // import Topics
+import Topics from "./Admin/Topics";
 import Questions from "./Admin/Questions";
 
 function AdminPanel() {
   const [showUsers, setShowUsers] = useState(false);
-
   const [attemptScores, setAttemptScores] = useState([]);
-
   const [showScore, setShowScore] = useState(false);
   const [attempts, setAttempts] = useState([]);
   const [userName, setUserName] = useState("");
@@ -17,10 +15,11 @@ function AdminPanel() {
   const [showTopics, setShowTopics] = useState(false);
   const [topicsCourseId, setTopicsCourseId] = useState(null);
   const token = localStorage.getItem("token");
-
   const [showQuestions, setShowQuestions] = useState(false);
   const [questionsTopicId, setQuestionsTopicId] = useState(null);
   const [questionsType, setQuestionsType] = useState("questions");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortByBestScore, setSortByBestScore] = useState(false);
 
   const handleAddQuestions = (topicId) => {
     setQuestionsTopicId(topicId);
@@ -67,23 +66,51 @@ function AdminPanel() {
     }
   }, [showScore, token]);
 
-  // Handler to open Topics
   const handleEditTopics = (courseId) => {
     setTopicsCourseId(courseId);
     setShowTopics(true);
   };
 
-  // Handler to go back to Courses
   const handleBackToCourses = () => {
     setShowTopics(false);
     setTopicsCourseId(null);
   };
+
+  // Sort by best score or latest topic quiz result first (descending)
+  // Replace 'created_at' with your actual timestamp field if needed
+  let sortedScores = attemptScores.slice();
+  if (sortByBestScore) {
+    sortedScores = sortedScores.sort(
+      (a, b) => (b.best_score ?? 0) - (a.best_score ?? 0)
+    );
+  } else {
+    sortedScores = sortedScores.sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
+  }
+
+  // Filter by search term
+  const filteredScores = sortedScores.filter(
+    (a) =>
+      a.user_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.user_email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.topic_title?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const Scores = (
     <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
       <h2 className="text-2xl font-bold text-indigo-700 mb-6">
         User Quiz Attempts
       </h2>
+      <div className="mb-4 flex items-center">
+        <input
+          type="text"
+          placeholder="Search by student, email, or topic..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border border-indigo-300 rounded px-4 py-2 w-1/3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        />
+      </div>
       <div className="overflow-x-auto">
         <table className="min-w-full border border-gray-200 rounded-lg">
           <thead>
@@ -106,20 +133,46 @@ function AdminPanel() {
               <th className="py-3 px-4 text-left font-semibold text-indigo-700">
                 Third Attempt
               </th>
-              <th className="py-3 px-4 text-left font-semibold text-indigo-700">
+              <th
+                className="py-3 px-4 text-left font-semibold text-indigo-700 cursor-pointer flex items-center gap-2 select-none"
+                onClick={() => setSortByBestScore((prev) => !prev)}
+              >
                 Best Score
+                <span>
+                  {sortByBestScore ? (
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+                      <path
+                        d="M7 14l5-5 5 5"
+                        stroke="#4F46E5"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  ) : (
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24">
+                      <path
+                        d="M7 14l5-5 5 5"
+                        stroke="#A5B4FC"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </span>
               </th>
             </tr>
           </thead>
           <tbody>
-            {attemptScores.length === 0 ? (
+            {filteredScores.length === 0 ? (
               <tr>
                 <td colSpan={7} className="py-6 text-center text-gray-500">
                   No attempts found.
                 </td>
               </tr>
             ) : (
-              attemptScores.map((a, idx) => (
+              filteredScores.map((a, idx) => (
                 <tr key={idx} className="hover:bg-indigo-50 transition">
                   <td className="py-2 px-4 border-b border-gray-100">
                     {a.user_name}
