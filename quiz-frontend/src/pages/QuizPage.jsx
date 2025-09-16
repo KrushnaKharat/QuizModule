@@ -326,6 +326,12 @@ function QuizPage() {
           >
             Back to Dashboard
           </button>
+          <button
+            className="mt-2 px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg font-bold shadow hover:scale-105 hover:from-blue-600 hover:to-indigo-700 transition"
+            onClick={() => window.open("https://appliedinsights.in/", "_blank")}
+          >
+            Visit Our Website
+          </button>
         </div>
 
         {/* Result Card for Each Question */}
@@ -438,6 +444,12 @@ function QuizPage() {
             onClick={() => navigate("/dashboard")}
           >
             Back to Dashboard
+          </button>
+          <button
+            className="mt-2 px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg font-bold shadow hover:scale-105 hover:from-blue-600 hover:to-indigo-700 transition"
+            onClick={() => window.open("https://appliedinsights.in/", "_blank")}
+          >
+            Visit Our Website
           </button>
         </div>
       </div>
@@ -618,9 +630,14 @@ function QuizPage() {
             <span className=" text-lg text-indigo-800 font-bold  ">
               Applied InSights
             </span>
-            <span className=" text-lg text-indigo-800 font-bold  " >
+            <button
+              className="mt-2 px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg font-bold shadow hover:scale-105 hover:from-blue-600 hover:to-indigo-700 transition"
+              onClick={() =>
+                window.open("https://appliedinsights.in/", "_blank")
+              }
+            >
               Visit Our Website
-            </span>
+            </button>
           </div>
         </div>
       </div>
