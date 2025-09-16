@@ -2,13 +2,35 @@ const pool = require("../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+// exports.register = async (req, res) => {
+//   const { name, email, password, role, courses } = req.body; // courses: array of course IDs
+//   const hash = await bcrypt.hash(password, 10);
+//   try {
+//     const result = await pool.query(
+//       "INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id",
+//       [name, email, hash, role]
+//     );
+//     const userId = result.rows[0].id;
+//     if (Array.isArray(courses) && courses.length > 0) {
+//       for (const courseId of courses) {
+//         await pool.query(
+//           "INSERT INTO user_courses (user_id, course_id) VALUES ($1, $2)",
+//           [userId, courseId]
+//         );
+//       }
+//     }
+//     res.json({ msg: "Registered successfully" });
+//   } catch (err) {
+//     res.status(500).json(err);
+//   }
+// };
 exports.register = async (req, res) => {
-  const { name, email, password, role, courses } = req.body; // courses: array of course IDs
+  const { name, email, password, role, courses, mobile } = req.body; // add mobile
   const hash = await bcrypt.hash(password, 10);
   try {
     const result = await pool.query(
-      "INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4) RETURNING id",
-      [name, email, hash, role]
+      "INSERT INTO users (name, email, password, role, phone) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+      [name, email, hash, role, mobile]
     );
     const userId = result.rows[0].id;
     if (Array.isArray(courses) && courses.length > 0) {
@@ -47,7 +69,9 @@ exports.login = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const result = await pool.query("SELECT id, name, email, role FROM users");
+    const result = await pool.query(
+      "SELECT id, name, email, phone, role FROM users"
+    );
     res.json(result.rows);
   } catch (err) {
     res.status(500).json(err);

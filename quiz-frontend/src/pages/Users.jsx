@@ -257,6 +257,7 @@ function Users({ token }) {
           <tr>
             <th className="p-2 border">Name</th>
             <th className="p-2 border">Email</th>
+            <th className="p-2 border">Mobile No.</th>
             <th className="p-2 border">Role</th>
             <th className="p-2 border">Courses</th>
             <th className="p-2 border">Action</th>
@@ -267,6 +268,7 @@ function Users({ token }) {
             <tr key={user.id}>
               <td className="p-2 border">{user.name}</td>
               <td className="p-2 border">{user.email}</td>
+              <td className="p-2 border">{user.phone}</td>
               <td className="p-2 border">{user.role}</td>
               <td className="p-2 border">
                 <UserCourses userId={user.id} token={token} />

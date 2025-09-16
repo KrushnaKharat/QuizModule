@@ -10,6 +10,7 @@ function Login() {
   const [errorMsg, setErrorMsg] = useState("");
   const [signupName, setSignupName] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
+  const [signupMobile, setSignupMobile] = useState(""); // <-- add this
   const [signupPassword, setSignupPassword] = useState("");
   const [signupError, setSignupError] = useState("");
   const [signupSuccess, setSignupSuccess] = useState("");
@@ -54,6 +55,7 @@ function Login() {
         name: signupName,
         email: signupEmail,
         password: signupPassword,
+        mobile: signupMobile, // <-- send mobile
         role: "user",
         courses: [2], // Always assign Python course (id 2)
       });
@@ -63,6 +65,7 @@ function Login() {
       setIsSignup(false);
       setSignupName("");
       setSignupEmail("");
+      setSignupMobile(""); // <-- clear mobile
       setSignupPassword("");
     } catch (err) {
       setSignupError(
@@ -110,6 +113,14 @@ function Login() {
                 value={signupEmail}
                 onChange={(e) => setSignupEmail(e.target.value)}
                 className="w-full mb-4 px-4 py-3 border border-indigo-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-indigo-50 transition"
+              />
+              <input
+                type="text"
+                placeholder="Mobile Number"
+                value={signupMobile}
+                onChange={(e) => setSignupMobile(e.target.value)}
+                className="w-full mb-4 px-4 py-3 border border-indigo-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-indigo-50 transition"
+                maxLength={15}
               />
               <div className="relative mb-4">
                 <input
