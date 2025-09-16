@@ -6,10 +6,13 @@ const {
   updateTopic,
   deleteTopic,
   getTopicById,
+  getAllAndEachTopics,
 } = require("../controllers/topicController");
 const { authMiddleware } = require("../middleware/authMiddleware");
 
 router.get("/:courseId/topics", authMiddleware, getAllTopics);
+router.get("/topics", authMiddleware, getAllAndEachTopics);
+
 router.post("/:courseId/topics", authMiddleware, addTopic);
 router.put("/:courseId/topics/:topicId", authMiddleware, updateTopic);
 router.delete("/:courseId/topics/:topicId", authMiddleware, deleteTopic);
