@@ -298,104 +298,215 @@ function AdminPanel() {
   );
 
   return (
-    <div className="min-h-screen w-full flex bg-gray-50 overflow-hidden">
-      <div className="w-1/5 bg-gray-500 flex flex-col p-4 gap-12 text-white align-middle text-lg">
-        <div className="w-full bg-gray-500 flex flex-col p-4 gap-12 text-white align-middle text-lg">
-          <div className="text-center">
-            <h2>{userName}</h2>
-            <p className="text-sm mt-2">{userEmail}</p>
-          </div>
-          <div className="flex flex-col text-center">
-            <a
-              href="#"
-              className="p-4"
-              onClick={() => {
-                setShowUsers(false);
-                setShowTopics(false);
-                setShowScore(false);
-                setShowQuestions(false);
-              }}
-            >
-              Home
-            </a>
-            <a
-              href="#"
-              className="p-4"
-              onClick={() => {
-                setShowUsers(false);
-                setShowTopics(true);
-                setShowScore(false);
-                setShowQuestions(false);
-              }}
-            >
-              Courses
-            </a>
-            <a
-              href="#"
-              className="p-4"
-              onClick={() => {
-                setShowUsers(true);
-                setShowTopics(false);
-                setShowScore(false);
-                setShowQuestions(false);
-              }}
-            >
-              Users
-            </a>
-            <a
-              href="#"
-              className="p-4"
-              onClick={() => {
-                setShowScore(true);
-                setShowUsers(false);
-                setShowTopics(false);
-                setShowQuestions(false);
-              }}
-            >
-              Scores
-            </a>
-          </div>
+    <div className="min-h-screen w-full flex bg-gradient-to-br from-indigo-100 via-blue-50 to-purple-100 overflow-hidden">
+      {/* Sidebar */}
+      <div className="w-1/5 bg-gradient-to-b from-indigo-700 to-indigo-900 flex flex-col p-6 gap-12 text-white shadow-2xl">
+        <div className="flex flex-col items-center gap-4">
+          <img
+            src="/pictures/logo.png"
+            alt="Logo"
+            className="h-16 w-16 rounded-full shadow-lg border-4 border-white"
+          />
+          <h2 className="text-xl font-bold tracking-wide">{userName}</h2>
+          <p className="text-sm text-indigo-200">{userEmail}</p>
         </div>
-      </div>
-      <div className="ml-2 w-3/4">
-        <div className="flex justify-between items-center mb-6 mt-10">
-          <h2 className="text-3xl font-bold text-indigo-700">Admin Panel</h2>
+        <nav className="flex flex-col gap-2 mt-8">
           <button
+            className={`py-3 rounded-xl font-semibold transition-all hover:bg-indigo-600 hover:scale-105 ${
+              !showUsers && !showTopics && !showScore && !showQuestions
+                ? "bg-indigo-600 shadow-lg"
+                : ""
+            }`}
             onClick={() => {
-              localStorage.clear();
-              window.location.href = "/";
+              setShowUsers(false);
+              setShowTopics(false);
+              setShowScore(false);
+              setShowQuestions(false);
             }}
-            className="bg-red-500 text-white px-4 py-2 rounded"
           >
-            Logout
+            <span className="inline-flex items-center gap-2">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 12l2-2m0 0l7-7 7 7M13 5v6h6"
+                />
+              </svg>
+              Home
+            </span>
           </button>
-        </div>
-        {/* Main content switch */}
-        {!showScore && !showUsers && !showQuestions && !showTopics ? (
-          Home
-        ) : showScore ? (
-          Scores
-        ) : showUsers ? (
-          <Users token={token} />
-        ) : showQuestions && questionsTopicId ? (
-          <Questions
-            topicId={questionsTopicId}
-            token={token}
-            onBack={handleBackToTopics}
-            type={questionsType}
-          />
-        ) : showTopics && topicsCourseId ? (
-          <Topics
-            courseId={topicsCourseId}
-            token={token}
-            onBack={handleBackToCourses}
-            onAddQuestions={handleAddQuestions}
-            onAddPracticeQuestions={handleAddPracticeQuestions}
-          />
-        ) : (
-          <Courses onEditTopics={handleEditTopics} />
-        )}
+          <button
+            className={`py-3 rounded-xl font-semibold transition-all hover:bg-indigo-600 hover:scale-105 ${
+              showTopics ? "bg-indigo-600 shadow-lg" : ""
+            }`}
+            onClick={() => {
+              setShowUsers(false);
+              setShowTopics(true);
+              setShowScore(false);
+              setShowQuestions(false);
+            }}
+          >
+            <span className="inline-flex items-center gap-2">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 8c-1.657 0-3 1.343-3 3v5a3 3 0 006 0v-5c0-1.657-1.343-3-3-3z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 20h14"
+                />
+              </svg>
+              Courses
+            </span>
+          </button>
+          <button
+            className={`py-3 rounded-xl font-semibold transition-all hover:bg-indigo-600 hover:scale-105 ${
+              showUsers ? "bg-indigo-600 shadow-lg" : ""
+            }`}
+            onClick={() => {
+              setShowUsers(true);
+              setShowTopics(false);
+              setShowScore(false);
+              setShowQuestions(false);
+            }}
+          >
+            <span className="inline-flex items-center gap-2">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87"
+                />
+                <circle
+                  cx="12"
+                  cy="7"
+                  r="4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Users
+            </span>
+          </button>
+          <button
+            className={`py-3 rounded-xl font-semibold transition-all hover:bg-indigo-600 hover:scale-105 ${
+              showScore ? "bg-indigo-600 shadow-lg" : ""
+            }`}
+            onClick={() => {
+              setShowScore(true);
+              setShowUsers(false);
+              setShowTopics(false);
+              setShowQuestions(false);
+            }}
+          >
+            <span className="inline-flex items-center gap-2">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 19v2m0-2a7 7 0 100-14 7 7 0 000 14z"
+                />
+              </svg>
+              Scores
+            </span>
+          </button>
+        </nav>
+        <button
+          onClick={() => {
+            localStorage.clear();
+            window.location.href = "/";
+          }}
+          className="mt-auto bg-gradient-to-r from-red-500 to-red-700 text-white px-4 py-3 rounded-xl font-bold shadow-lg hover:scale-105 transition"
+        >
+          Logout
+        </button>
       </div>
+      {/* Main Content */}
+      <div className="flex-1 px-8 py-10">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-4xl font-extrabold text-indigo-800 drop-shadow-lg tracking-tight">
+            Admin Dashboard
+          </h2>
+        </div>
+        <div className="w-full">
+          {/* Main content switch */}
+          {!showScore && !showUsers && !showQuestions && !showTopics ? (
+            <div className="animate-fade-in">{Home}</div>
+          ) : showScore ? (
+            <div className="animate-fade-in">{Scores}</div>
+          ) : showUsers ? (
+            <div className="animate-fade-in">
+              <Users token={token} />
+            </div>
+          ) : showQuestions && questionsTopicId ? (
+            <div className="animate-fade-in">
+              <Questions
+                topicId={questionsTopicId}
+                token={token}
+                onBack={handleBackToTopics}
+                type={questionsType}
+              />
+            </div>
+          ) : showTopics && topicsCourseId ? (
+            <div className="animate-fade-in">
+              <Topics
+                courseId={topicsCourseId}
+                token={token}
+                onBack={handleBackToCourses}
+                onAddQuestions={handleAddQuestions}
+                onAddPracticeQuestions={handleAddPracticeQuestions}
+              />
+            </div>
+          ) : (
+            <div className="animate-fade-in">
+              <Courses onEditTopics={handleEditTopics} />
+            </div>
+          )}
+        </div>
+      </div>
+      <style>
+        {`
+        .animate-fade-in {
+          animation: fadeIn 0.7s;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(20px);}
+          to { opacity: 1; transform: translateY(0);}
+        }
+      `}
+      </style>
     </div>
   );
 }

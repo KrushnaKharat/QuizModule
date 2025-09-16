@@ -34,9 +34,12 @@ function Courses({ onEditTopics }) {
 
   const loadQuestions = async (id) => {
     setQuizId(id);
-    const res = await axios.get(`https://quizmodule.onrender.com/api/questions/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await axios.get(
+      `https://quizmodule.onrender.com/api/questions/${id}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     setQuestions(res.data);
   };
 
@@ -55,13 +58,20 @@ function Courses({ onEditTopics }) {
     }
 
     try {
-      await axios.post("https://quizmodule.onrender.com/api/courses", newCourse, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.post(
+        "https://quizmodule.onrender.com/api/courses",
+        newCourse,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-      const res = await axios.get("https://quizmodule.onrender.com/api/courses", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.get(
+        "https://quizmodule.onrender.com/api/courses",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       setNewCourse({ title: "" }); // Clear form
       setCourse(res.data);
@@ -134,14 +144,18 @@ function Courses({ onEditTopics }) {
   };
 
   const updateQuestion = async (q) => {
-    await axios.put(`https://quizmodule.onrender.com/api/questions/${q.id}`, q, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    await axios.put(
+      `https://quizmodule.onrender.com/api/questions/${q.id}`,
+      q,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     loadQuestions(quizId);
   };
 
   return (
-    <div className="min-h-screen w-screen flex flex-col bg-gray-50 overflow-hidden">
+    <div className=" w-full flex flex-col bg-gray-50 overflow-hidden">
       <div className="bg-red rounded p-6 shadow mb-8 flex justify-center flex-col w-full">
         <h3 className="text-xl font-semibold mb-4">Add New Courses</h3>
         <div className="flex flex-col md:flex-row gap-4 w-1/2">
@@ -170,10 +184,10 @@ function Courses({ onEditTopics }) {
         </div>
       </div>
 
-      <div className=" grid grid-cols-3 w-3/4 gap-2">
+      <div className=" grid grid-cols-3 w-3/2 gap-2">
         {course.map((q) => (
-          <div key={q.id} className="bg-white rounded shadow  ">
-            <div className="flex hover:bg-indigo-100 justify-between transition w-full p-2 ">
+          <div key={q.id} className="bg-blue-600 text-white rounded shadow  ">
+            <div className="flex hover:bg-indigo-700 justify-between transition w-full p-2 ">
               <div className="font-semibold text-xl">{q.title}</div>
               <div className="flex flex-col gap-2 justify-between h-full">
                 {/* <button
