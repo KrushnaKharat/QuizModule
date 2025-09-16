@@ -5,6 +5,7 @@ const {
   addPracticeQuestionsToTopic,
   updatePracticeQuestions,
   deletePracticeQuestions,
+  importPracticeQuestionsFromFile,
 } = require("../controllers/practiceQuestionController");
 const { authMiddleware } = require("../middleware/authMiddleware");
 
@@ -18,6 +19,13 @@ router.post(
   "/topics/:topicId/practicequestions",
   authMiddleware,
   addPracticeQuestionsToTopic
+);
+
+router.post(
+  "/topics/:topicId/importpractice",
+  authMiddleware,
+  upload.single("file"),
+  importPracticeQuestionsFromFile
 );
 
 // You can keep or remove this if not needed

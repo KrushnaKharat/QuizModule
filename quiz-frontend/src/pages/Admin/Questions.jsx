@@ -15,16 +15,18 @@ function Questions({ topicId, token, onBack, type = "questions" }) {
 
     setImportLoading(true); // Start loading
     try {
-      await axios.post(
-        `https://quizmodule.onrender.com/api/topics/${topicId}/import`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      // Use different endpoint for practice questions
+      const url =
+        type === "practicequestions"
+          ? `https://quizmodule.onrender.com/api/practice/topics/${topicId}/importpractice`
+          : `https://quizmodule.onrender.com/api/topics/${topicId}/import`;
+
+      await axios.post(url, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
       setImportFile(null);
       setImportType("");
       fetchQuestions();
