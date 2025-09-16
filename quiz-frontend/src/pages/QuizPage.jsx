@@ -249,24 +249,27 @@ function QuizPage() {
             Quiz Instructions
           </h2>
           <ul className="text-left  mb-6 list-disc list-inside text-gray-700">
-            <li>Answer all questions within the time limit.</li>
+            <b><li>Answer all questions within the time limit.</li>
             <li>Once you start, the timer will not pause.</li>
             <li>You cannot retake the quiz after max attempts.</li>
             <li>Quiz will auto-submit when time is up.</li>
-            <li>
-              Do not change tab, minimize, or leave this page during the quiz.{" "}
-              If you do, your quiz will be submitted automatically.
-            </li>
-            <li>
-              Do not use the browser back or refresh buttons during the quiz.
-              This will also submit your quiz automatically.
-            </li>
+           
             <li>Answer all questions before submitting.</li>
             <li>
               You have {Math.floor((timer || 600) / 60)} minutes to complete the
               quiz.
             </li>
             <li>You have a maximum of {maxAttempts} attempts for this quiz.</li>
+            </b>
+            
+             <li><b className="text-red-700">
+              Do not change tab, minimize, or leave this page during the quiz.{" "}
+              If you do, your quiz will be submitted automatically.</b>
+            </li>
+            <li><b className="text-red-700">
+              Do not use the browser back or refresh buttons during the quiz.
+              This will also submit your quiz automatically.</b>
+            </li>
           </ul>
           <button
             className="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700"
