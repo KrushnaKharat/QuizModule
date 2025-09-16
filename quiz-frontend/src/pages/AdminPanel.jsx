@@ -20,14 +20,7 @@ function AdminPanel() {
   const [questionsType, setQuestionsType] = useState("questions");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortByBestScore, setSortByBestScore] = useState(""); // "", "asc", "desc"
-  const [dashboard, setDashboard] = useState({
-    totalUsers: 0,
-    totalAdmins: 0,
-    totalCourses: 0,
-    courseTopics: [],
-    usersSolved: 0,
-    usersRemaining: 0,
-  });
+
   const [user, setUser] = useState("");
   const [courses, setCourses] = useState("");
   const [topics, setTopics] = useState("");
@@ -53,10 +46,6 @@ function AdminPanel() {
                   headers: { Authorization: `Bearer ${token}` },
                 })
                 .then((res) => setTopics(res.data)),
-              axios.get(
-                "https://quizmodule.onrender.com/api/attempts/admin/attempts/aggregated",
-                { headers: { Authorization: `Bearer ${token}` } }
-              ),
             ]);
         } catch (e) {
           // Handle error if needed
@@ -73,39 +62,14 @@ function AdminPanel() {
         <div className="text-4xl font-extrabold mb-2">{user.length}</div>
         <div className="text-lg font-semibold">Total Users</div>
       </div>
-      <div className="bg-gradient-to-br from-green-400 to-blue-500 text-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
-        <div className="text-4xl font-extrabold mb-2">
-          {dashboard.totalAdmins}
-        </div>
-        <div className="text-lg font-semibold">Total Admins</div>
-      </div>
+
       <div className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
         <div className="text-4xl font-extrabold mb-2">{courses.length}</div>
         <div className="text-lg font-semibold">Total Courses</div>
       </div>
       <div className="bg-gradient-to-br from-pink-400 to-red-500 text-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
         <div className="text-4xl font-extrabold mb-2">{topics.length}</div>
-        <div className="text-lg font-semibold">Topics</div>
-      </div>
-      <div className="col-span-1 md:col-span-2 bg-white rounded-2xl shadow-lg p-8 mt-4">
-        <div className="text-xl font-bold text-indigo-700 mb-4">
-          Course Topics
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {dashboard.courseTopics.map((ct, idx) => (
-            <div
-              key={idx}
-              className="flex items-center justify-between bg-indigo-50 rounded-lg px-4 py-3"
-            >
-              <span className="font-semibold text-indigo-700">
-                {ct.courseTitle}
-              </span>
-              <span className="text-indigo-500 font-bold">
-                {ct.topicCount} Topics
-              </span>
-            </div>
-          ))}
-        </div>
+        <div className="text-lg font-semibold">Total Topics</div>
       </div>
     </div>
   );
