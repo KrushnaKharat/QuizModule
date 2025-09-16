@@ -28,6 +28,9 @@ function AdminPanel() {
     usersSolved: 0,
     usersRemaining: 0,
   });
+  const [user, setUser] = useState("");
+  const [courses, setCourses] = useState("");
+  const [topics, setTopics] = useState("");
 
   useEffect(() => {
     if (!showUsers && !showScore && !showTopics && !showQuestions) {
@@ -35,64 +38,39 @@ function AdminPanel() {
         try {
           const [usersRes, coursesRes, topicsRes, attemptsRes] =
             await Promise.all([
-              axios.get("https://quizmodule.onrender.com/api/users", {
-                headers: { Authorization: `Bearer ${token}` },
-              }),
-              axios.get("https://quizmodule.onrender.com/api/courses", {
-                headers: { Authorization: `Bearer ${token}` },
-              }),
-              axios.get("https://quizmodule.onrender.com/api/topics", {
-                headers: { Authorization: `Bearer ${token}` },
-              }),
+              axios
+                .get("https://quizmodule.onrender.com/api/auth/users", {
+                  headers: { Authorization: `Bearer ${token}` },
+                })
+                .then((res) => setUser(res.data)),
+              axios
+                .get("https://quizmodule.onrender.com/api/courses", {
+                  headers: { Authorization: `Bearer ${token}` },
+                })
+                .then((res) => setCourses(res.data)),
+              axios
+                .get("https://quizmodule.onrender.com/api/course/topics", {
+                  headers: { Authorization: `Bearer ${token}` },
+                })
+                .then((res) => setTopics(res.data)),
               axios.get(
                 "https://quizmodule.onrender.com/api/attempts/admin/attempts/aggregated",
                 { headers: { Authorization: `Bearer ${token}` } }
               ),
             ]);
-          const users = usersRes.data;
-          const courses = coursesRes.data;
-          const topics = topicsRes.data;
-          const attempts = attemptsRes.data;
-
-          // Count admins and users
-          const totalAdmins = users.filter((u) => u.role === "admin").length;
-          const totalUsers = users.filter((u) => u.role === "user").length;
-
-          // Course topics count
-          const courseTopics = courses.map((course) => ({
-            courseTitle: course.title,
-            topicCount: topics.filter((t) => t.course_id === course.id).length,
-          }));
-
-          // Users who solved at least one quiz
-          const usersWithAttempts = new Set(attempts.map((a) => a.user_id));
-          const usersSolved = users.filter(
-            (u) => u.role === "user" && usersWithAttempts.has(u.id)
-          ).length;
-          const usersRemaining = totalUsers - usersSolved;
-
-          setDashboard({
-            totalUsers,
-            totalAdmins,
-            totalCourses: courses.length,
-            courseTopics,
-            usersSolved,
-            usersRemaining,
-          });
         } catch (e) {
           // Handle error if needed
+          console.log(e);
         }
       };
       fetchDashboard();
     }
-  }, [showUsers, showScore, showTopics, showQuestions, token]);
+  }, [token]);
 
   const Home = (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
       <div className="bg-gradient-to-br from-indigo-500 to-purple-500 text-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
-        <div className="text-4xl font-extrabold mb-2">
-          {dashboard.totalUsers}
-        </div>
+        <div className="text-4xl font-extrabold mb-2">{user.length}</div>
         <div className="text-lg font-semibold">Total Users</div>
       </div>
       <div className="bg-gradient-to-br from-green-400 to-blue-500 text-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
@@ -102,19 +80,12 @@ function AdminPanel() {
         <div className="text-lg font-semibold">Total Admins</div>
       </div>
       <div className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
-        <div className="text-4xl font-extrabold mb-2">
-          {dashboard.totalCourses}
-        </div>
+        <div className="text-4xl font-extrabold mb-2">{courses.length}</div>
         <div className="text-lg font-semibold">Total Courses</div>
       </div>
       <div className="bg-gradient-to-br from-pink-400 to-red-500 text-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
-        <div className="text-4xl font-extrabold mb-2">
-          {dashboard.usersSolved}
-        </div>
-        <div className="text-lg font-semibold">Users Solved Quizzes</div>
-        <div className="text-sm mt-2">
-          {dashboard.usersRemaining} users remaining
-        </div>
+        <div className="text-4xl font-extrabold mb-2">{topics.length}</div>
+        <div className="text-lg font-semibold">Topics</div>
       </div>
       <div className="col-span-1 md:col-span-2 bg-white rounded-2xl shadow-lg p-8 mt-4">
         <div className="text-xl font-bold text-indigo-700 mb-4">

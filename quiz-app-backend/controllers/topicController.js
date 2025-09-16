@@ -12,6 +12,14 @@ exports.getAllTopics = async (req, res) => {
     res.status(500).json(err);
   }
 };
+exports.getAllAndEachTopics = async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM topics");
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
 
 exports.getTopicById = async (req, res) => {
   const { topicId } = req.params;
