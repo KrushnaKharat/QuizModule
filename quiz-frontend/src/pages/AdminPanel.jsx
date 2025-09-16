@@ -20,6 +20,124 @@ function AdminPanel() {
   const [questionsType, setQuestionsType] = useState("questions");
   const [searchTerm, setSearchTerm] = useState("");
   const [sortByBestScore, setSortByBestScore] = useState(""); // "", "asc", "desc"
+  const [dashboard, setDashboard] = useState({
+    totalUsers: 0,
+    totalAdmins: 0,
+    totalCourses: 0,
+    courseTopics: [],
+    usersSolved: 0,
+    usersRemaining: 0,
+  });
+
+  useEffect(() => {
+    if (!showUsers && !showScore && !showTopics && !showQuestions) {
+      const fetchDashboard = async () => {
+        try {
+          const [usersRes, coursesRes, topicsRes, attemptsRes] =
+            await Promise.all([
+              axios.get("https://quizmodule.onrender.com/api/users", {
+                headers: { Authorization: `Bearer ${token}` },
+              }),
+              axios.get("https://quizmodule.onrender.com/api/courses", {
+                headers: { Authorization: `Bearer ${token}` },
+              }),
+              axios.get("https://quizmodule.onrender.com/api/topics", {
+                headers: { Authorization: `Bearer ${token}` },
+              }),
+              axios.get(
+                "https://quizmodule.onrender.com/api/attempts/admin/attempts/aggregated",
+                { headers: { Authorization: `Bearer ${token}` } }
+              ),
+            ]);
+          const users = usersRes.data;
+          const courses = coursesRes.data;
+          const topics = topicsRes.data;
+          const attempts = attemptsRes.data;
+
+          // Count admins and users
+          const totalAdmins = users.filter((u) => u.role === "admin").length;
+          const totalUsers = users.filter((u) => u.role === "user").length;
+
+          // Course topics count
+          const courseTopics = courses.map((course) => ({
+            courseTitle: course.title,
+            topicCount: topics.filter((t) => t.course_id === course.id).length,
+          }));
+
+          // Users who solved at least one quiz
+          const usersWithAttempts = new Set(attempts.map((a) => a.user_id));
+          const usersSolved = users.filter(
+            (u) => u.role === "user" && usersWithAttempts.has(u.id)
+          ).length;
+          const usersRemaining = totalUsers - usersSolved;
+
+          setDashboard({
+            totalUsers,
+            totalAdmins,
+            totalCourses: courses.length,
+            courseTopics,
+            usersSolved,
+            usersRemaining,
+          });
+        } catch (e) {
+          // Handle error if needed
+        }
+      };
+      fetchDashboard();
+    }
+  }, [showUsers, showScore, showTopics, showQuestions, token]);
+
+  const Home = (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
+      <div className="bg-gradient-to-br from-indigo-500 to-purple-500 text-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
+        <div className="text-4xl font-extrabold mb-2">
+          {dashboard.totalUsers}
+        </div>
+        <div className="text-lg font-semibold">Total Users</div>
+      </div>
+      <div className="bg-gradient-to-br from-green-400 to-blue-500 text-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
+        <div className="text-4xl font-extrabold mb-2">
+          {dashboard.totalAdmins}
+        </div>
+        <div className="text-lg font-semibold">Total Admins</div>
+      </div>
+      <div className="bg-gradient-to-br from-yellow-400 to-orange-500 text-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
+        <div className="text-4xl font-extrabold mb-2">
+          {dashboard.totalCourses}
+        </div>
+        <div className="text-lg font-semibold">Total Courses</div>
+      </div>
+      <div className="bg-gradient-to-br from-pink-400 to-red-500 text-white rounded-2xl shadow-lg p-8 flex flex-col items-center">
+        <div className="text-4xl font-extrabold mb-2">
+          {dashboard.usersSolved}
+        </div>
+        <div className="text-lg font-semibold">Users Solved Quizzes</div>
+        <div className="text-sm mt-2">
+          {dashboard.usersRemaining} users remaining
+        </div>
+      </div>
+      <div className="col-span-1 md:col-span-2 bg-white rounded-2xl shadow-lg p-8 mt-4">
+        <div className="text-xl font-bold text-indigo-700 mb-4">
+          Course Topics
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {dashboard.courseTopics.map((ct, idx) => (
+            <div
+              key={idx}
+              className="flex items-center justify-between bg-indigo-50 rounded-lg px-4 py-3"
+            >
+              <span className="font-semibold text-indigo-700">
+                {ct.courseTitle}
+              </span>
+              <span className="text-indigo-500 font-bold">
+                {ct.topicCount} Topics
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
   const handleAddQuestions = (topicId) => {
     setQuestionsTopicId(topicId);
@@ -304,7 +422,7 @@ function AdminPanel() {
           </div>
         </div>
       </div>
-      <div className="ml-2 w-3/4  ">
+      <div className="ml-2 w-3/4">
         <div className="flex justify-between items-center mb-6 mt-10">
           <h2 className="text-3xl font-bold text-indigo-700">Admin Panel</h2>
           <button
@@ -317,9 +435,10 @@ function AdminPanel() {
             Logout
           </button>
         </div>
-
         {/* Main content switch */}
-        {showScore ? (
+        {!showScore && !showUsers && !showQuestions && !showTopics ? (
+          Home
+        ) : showScore ? (
           Scores
         ) : showUsers ? (
           <Users token={token} />

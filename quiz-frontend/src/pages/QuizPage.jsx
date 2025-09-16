@@ -571,6 +571,9 @@ function QuizPage() {
             <span className=" text-lg text-indigo-800 font-bold  ">
               Applied InSights
             </span>
+            <span className=" text-lg text-indigo-800 font-bold  " >
+              Visit Our Website
+            </span>
           </div>
         </div>
       </div>
