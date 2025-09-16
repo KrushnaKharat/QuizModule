@@ -141,6 +141,39 @@ function QuizPage() {
     }
   };
 
+  useEffect(() => {
+    if (showInstructions || submitted || isSubmitting) return;
+
+    // Handler for tab change or window blur
+    const handleVisibility = () => {
+      if (
+        document.visibilityState === "hidden" &&
+        !submitted &&
+        !isSubmitting
+      ) {
+        handleSubmit();
+      }
+    };
+
+    // Handler for browser back/refresh
+    const handleBeforeUnload = (e) => {
+      if (!submitted && !isSubmitting) {
+        handleSubmit();
+        // Optionally show a warning (not all browsers show this)
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [showInstructions, submitted, isSubmitting]);
+
   const handleSubmit = async () => {
     if (submitted || isSubmitting || submitOnceRef.current) return; // Prevent double submit
     setIsSubmitting(true);
@@ -210,16 +243,30 @@ function QuizPage() {
   // Show instructions popup before quiz starts
   if (showInstructions) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-        <div className="bg-white rounded-xl shadow-lg p-8 max-w-lg w-full text-center">
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 w-full">
+        <div className="bg-white rounded-xl shadow-lg p-8  w-1/2 text-center">
           <h2 className="text-2xl font-bold mb-4 text-indigo-700">
             Quiz Instructions
           </h2>
-          <ul className="text-left mb-6 list-disc list-inside text-gray-700">
+          <ul className="text-left  mb-6 list-disc list-inside text-gray-700">
             <li>Answer all questions within the time limit.</li>
             <li>Once you start, the timer will not pause.</li>
             <li>You cannot retake the quiz after max attempts.</li>
             <li>Quiz will auto-submit when time is up.</li>
+            <li>
+              Do not change tab, minimize, or leave this page during the quiz.{" "}
+              If you do, your quiz will be  &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; submitted  automatically.
+            </li>
+            <li>
+              Do not use the browser back or refresh buttons during the quiz.
+              This will also submit your quiz &nbsp;&nbsp;&nbsp;&nbsp; automatically.
+            </li>
+            <li>Answer all questions before submitting.</li>
+            <li>
+              You have {Math.floor((timer || 600) / 60)} minutes to complete the
+              quiz.
+            </li>
+            <li>You have a maximum of {maxAttempts} attempts for this quiz.</li>
           </ul>
           <button
             className="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700"
