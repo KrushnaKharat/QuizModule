@@ -255,11 +255,11 @@ function QuizPage() {
             <li>Quiz will auto-submit when time is up.</li>
             <li>
               Do not change tab, minimize, or leave this page during the quiz.{" "}
-              If you do, your quiz will be  &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp; submitted  automatically.
+              If you do, your quiz will be submitted automatically.
             </li>
             <li>
               Do not use the browser back or refresh buttons during the quiz.
-              This will also submit your quiz &nbsp;&nbsp;&nbsp;&nbsp; automatically.
+              This will also submit your quiz automatically.
             </li>
             <li>Answer all questions before submitting.</li>
             <li>
