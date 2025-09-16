@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
@@ -15,6 +15,17 @@ function Login() {
   const [signupSuccess, setSignupSuccess] = useState("");
   const [isSignup, setIsSignup] = useState(false);
   const navigate = useNavigate();
+
+  // Autofill email after signup
+  useEffect(() => {
+    if (!isSignup) {
+      const lastSignupEmail = localStorage.getItem("lastSignupEmail");
+      if (lastSignupEmail) {
+        setEmail(lastSignupEmail);
+        localStorage.removeItem("lastSignupEmail");
+      }
+    }
+  }, [isSignup]);
 
   const handleLogin = async () => {
     setErrorMsg("");
@@ -47,6 +58,8 @@ function Login() {
         courses: [2], // Always assign Python course (id 2)
       });
       setSignupSuccess("🎉 Registration successful! You can now log in.");
+      // Store email for autofill on login
+      localStorage.setItem("lastSignupEmail", signupEmail);
       setIsSignup(false);
       setSignupName("");
       setSignupEmail("");
@@ -189,15 +202,19 @@ function Login() {
               <input
                 type="email"
                 placeholder="Email"
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full mb-4 px-4 py-3 border border-indigo-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-indigo-50 transition"
+                autoComplete="username"
               />
               <div className="relative mb-4">
                 <input
                   type={showPassword ? "text" : "password"}
                   placeholder="Password"
+                  value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full px-4 py-3 border border-indigo-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-indigo-50 pr-12 transition"
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"
