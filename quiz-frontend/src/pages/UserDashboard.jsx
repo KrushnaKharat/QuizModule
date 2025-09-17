@@ -162,8 +162,13 @@ function UserDashboard() {
           </span>
         </div>
         {/* Title */}
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-indigo-700 text-center flex-1">
-          Your Courses
+        <h1 className="text-xl sm:text-2xl font-extrabold text-indigo-700 text-center flex-1">
+          <button
+            className="mt-2 px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg font-bold shadow hover:scale-105 hover:from-blue-600 hover:to-indigo-700 transition"
+            onClick={() => window.open("https://appliedinsights.in/", "_blank")}
+          >
+            Visit Our Website
+          </button>
         </h1>
         {/* User Name and Logout */}
         <div className="flex items-center gap-4">

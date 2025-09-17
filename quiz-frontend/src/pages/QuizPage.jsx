@@ -152,7 +152,9 @@ function QuizPage() {
         !submitted &&
         !isSubmitting
       ) {
-        alert("You changed the tab. Your quiz will be submitted automatically.");
+        alert(
+          "You changed the tab. Your quiz will be submitted automatically."
+        );
         handleSubmit();
       }
     };
@@ -250,24 +252,31 @@ function QuizPage() {
             Quiz Instructions
           </h2>
           <ul className="text-left  mb-6 list-disc list-inside text-gray-700">
-            <b><li>Answer all questions within the time limit.</li>
-            <li>Once you start, the timer will not pause.</li>
-            <li>You cannot retake the quiz after max attempts.</li>
-            <li>Quiz will auto-submit when time is up.</li>
-            <li>Answer all questions before submitting.</li>
-            <li>
-              You have {Math.floor((timer || 600) / 60)} minutes to complete the
-              quiz.
-            </li>
-            <li>You have a maximum of {maxAttempts} attempts for this quiz.</li>
+            <b>
+              <li>Answer all questions within the time limit.</li>
+              <li>Once you start, the timer will not pause.</li>
+              <li>You cannot retake the quiz after max attempts.</li>
+              <li>Quiz will auto-submit when time is up.</li>
+              <li>Answer all questions before submitting.</li>
+              <li>
+                You have {Math.floor((timer || 600) / 60)} minutes to complete
+                the quiz.
+              </li>
+              <li>
+                You have a maximum of {maxAttempts} attempts for this quiz.
+              </li>
             </b>
-            <li><b className="text-red-700">
-              Do not change tab, minimize, or leave this page during the quiz.{" "}
-              If you do, your quiz will be submitted automatically.</b>
+            <li>
+              <b className="text-red-700">
+                Do not change tab, minimize, or leave this page during the quiz.{" "}
+                If you do, your quiz will be submitted automatically.
+              </b>
             </li>
-            <li><b className="text-red-700">
-              Do not use the browser back button during the quiz.
-              This will also submit your quiz automatically.</b>
+            <li>
+              <b className="text-red-700">
+                Do not use the browser back button during the quiz. This will
+                also submit your quiz automatically.
+              </b>
             </li>
           </ul>
           <button
@@ -632,14 +641,6 @@ function QuizPage() {
             <span className=" text-lg text-indigo-800 font-bold  ">
               Applied InSights
             </span>
-            <button
-              className="mt-2 px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg font-bold shadow hover:scale-105 hover:from-blue-600 hover:to-indigo-700 transition"
-              onClick={() =>
-                window.open("https://appliedinsights.in/", "_blank")
-              }
-            >
-              Visit Our Website
-            </button>
           </div>
         </div>
       </div>
