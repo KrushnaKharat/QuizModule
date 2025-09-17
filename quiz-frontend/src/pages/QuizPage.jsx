@@ -141,6 +141,7 @@ function QuizPage() {
     }
   };
 
+  // Tab change/minimize/back: auto-submit with alert. Refresh: allowed.
   useEffect(() => {
     if (showInstructions || submitted || isSubmitting) return;
 
@@ -151,26 +152,26 @@ function QuizPage() {
         !submitted &&
         !isSubmitting
       ) {
+        alert("You changed the tab. Your quiz will be submitted automatically.");
         handleSubmit();
       }
     };
 
-    // Handler for browser back/refresh
-    const handleBeforeUnload = (e) => {
+    // Handler for browser back (optional)
+    const handlePopState = (e) => {
       if (!submitted && !isSubmitting) {
+        window.history.pushState(null, "", window.location.href);
         handleSubmit();
-        // Optionally show a warning (not all browsers show this)
-        e.preventDefault();
-        e.returnValue = "";
       }
     };
 
     document.addEventListener("visibilitychange", handleVisibility);
-    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.history.pushState(null, "", window.location.href);
+    window.addEventListener("popstate", handlePopState);
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibility);
-      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", handlePopState);
     };
   }, [showInstructions, submitted, isSubmitting]);
 
@@ -253,7 +254,6 @@ function QuizPage() {
             <li>Once you start, the timer will not pause.</li>
             <li>You cannot retake the quiz after max attempts.</li>
             <li>Quiz will auto-submit when time is up.</li>
-           
             <li>Answer all questions before submitting.</li>
             <li>
               You have {Math.floor((timer || 600) / 60)} minutes to complete the
@@ -261,13 +261,12 @@ function QuizPage() {
             </li>
             <li>You have a maximum of {maxAttempts} attempts for this quiz.</li>
             </b>
-            
-             <li><b className="text-red-700">
+            <li><b className="text-red-700">
               Do not change tab, minimize, or leave this page during the quiz.{" "}
               If you do, your quiz will be submitted automatically.</b>
             </li>
             <li><b className="text-red-700">
-              Do not use the browser back or refresh buttons during the quiz.
+              Do not use the browser back button during the quiz.
               This will also submit your quiz automatically.</b>
             </li>
           </ul>
