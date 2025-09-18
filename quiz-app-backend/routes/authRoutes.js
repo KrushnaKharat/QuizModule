@@ -8,6 +8,7 @@ const {
   getMe,
   getUserCourses,
   updateUser,
+  getAllEmails,
 } = require("../controllers/authController");
 const { authMiddleware } = require("../middleware/authMiddleware");
 
@@ -16,7 +17,7 @@ router.post("/login", login);
 router.get("/users", getAllUsers); // <-- Add this line
 router.get("/users/:id/courses", authMiddleware, getUserCourses);
 router.put("/users/:id", authMiddleware, updateUser);
-
+router.get("/emails", authMiddleware, getAllEmails);
 router.delete("/users/:id", deleteUser);
 router.get("/me", authMiddleware, getMe);
 

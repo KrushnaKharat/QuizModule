@@ -141,3 +141,12 @@ exports.updateUser = async (req, res) => {
     res.status(500).json(err);
   }
 };
+
+exports.getAllEmails = async (req, res) => {
+  try {
+    const result = await pool.query("SELECT id, email FROM users");
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};

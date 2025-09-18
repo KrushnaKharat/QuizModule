@@ -7,6 +7,7 @@ import {
   useNavigate,
   Navigate,
 } from "react-router-dom";
+import NotificationBell from "./NotificationBell";
 
 function UserDashboard() {
   const [quizzes, setQuizzes] = useState([]);
@@ -187,6 +188,7 @@ function UserDashboard() {
 
         {/* User Name and Logout */}
         <div className="flex items-center gap-4">
+          <NotificationBell userId={userId} token={token} />
           <span className="text-indigo-700 font-semibold text-lg">
             {userName && `Hi, ${userName}`}
           </span>
