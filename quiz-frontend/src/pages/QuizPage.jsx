@@ -343,7 +343,9 @@ function QuizPage() {
           >
             Visit Our Website
           </button>
+          
         </div>
+       
 
         {/* Result Card for Each Question */}
         <div className="bg-white shadow-lg rounded-xl px-8 py-8 w-full max-w-xl flex flex-col items-center">
@@ -462,6 +464,7 @@ function QuizPage() {
           >
             Visit Our Website
           </button>
+         
         </div>
       </div>
     );
