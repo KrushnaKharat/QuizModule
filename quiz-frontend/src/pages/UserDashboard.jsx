@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+  Navigate,
+} from "react-router-dom";
 
 function UserDashboard() {
   const [quizzes, setQuizzes] = useState([]);
@@ -149,9 +155,6 @@ function UserDashboard() {
     window.location.href = "/";
   };
 
-
- 
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white pl-6 pr-6 ">
       <div className="flex items-center justify-between mb-8 border-b-4 border-purple-600 py-4 px-2 rounded-xl shadow">
@@ -173,15 +176,15 @@ function UserDashboard() {
             onClick={() => window.open("https://appliedinsights.in/", "_blank")}
           >
             Visit Our Website
-          </button >
-             </h1>
-             <button
-             className="mt-2 px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg font-bold shadow hover:scale-105 hover:from-blue-600 hover:to-indigo-700 transition"
-             onClick={ () => navigate("/quizgame")}
-             >Quiz Game</button>
-          
-          
-     
+          </button>
+        </h1>
+        <button
+          className="mt-2 px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg font-bold shadow hover:scale-105 hover:from-blue-600 hover:to-indigo-700 transition"
+          onClick={() => navigate("/quizgame")}
+        >
+          Quiz Game
+        </button>
+
         {/* User Name and Logout */}
         <div className="flex items-center gap-4">
           <span className="text-indigo-700 font-semibold text-lg">

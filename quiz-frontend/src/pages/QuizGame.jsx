@@ -1,4 +1,6 @@
+
 import React, { useState } from "react";
+
 
 function QuizGame() {
   const [showForm, setShowForm] = useState(false);
@@ -37,6 +39,7 @@ function QuizGame() {
   };
 
   return (
+
     <div className="p-8 flex flex-col items-center">
       <button
         className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-indigo-700 transition mb-6"
@@ -143,4 +146,6 @@ function QuizGame() {
   );
 }
 
+
 export default QuizGame;
+
