@@ -19,14 +19,20 @@ function Lobby() {
   useEffect(() => {
     const fetchLobby = () => {
       axios
-        .get(`https://quizmodule.onrender.com/api/groupquiz/lobby/${session_id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        .get(
+          `https://quizmodule.onrender.com/api/groupquiz/lobby/${session_id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
         .then((res) => setInvites(res.data));
       axios
-        .get(`https://quizmodule.onrender.com/api/groupquiz/sessioninfo/${session_id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+        .get(
+          `https://quizmodule.onrender.com/api/groupquiz/sessioninfo/${session_id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
         .then((res) => {
           setStatus(res.data.status);
           setHostId(res.data.host_id);
@@ -76,9 +82,12 @@ function Lobby() {
     setEmailInput("");
     setSuggestions([]);
     // Find user id by email
-    const usersRes = await axios.get("https://quizmodule.onrender.com/api/auth/emails", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const usersRes = await axios.get(
+      "https://quizmodule.onrender.com/api/auth/emails",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     const user = usersRes.data.find((u) => u.email === email);
     if (!user) return;
     // Send invite
@@ -92,9 +101,12 @@ function Lobby() {
     );
     // Refetch invites
     axios
-      .get(`https://quizmodule.onrender.com/api/groupquiz/lobby/${session_id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .get(
+        `https://quizmodule.onrender.com/api/groupquiz/lobby/${session_id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
       .then((res) => setInvites(res.data));
   };
 
@@ -119,15 +131,15 @@ function Lobby() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200">
-      <div className="bg-white shadow-lg rounded-xl px-8 py-8 w-full max-w-3xl flex flex-col items-center">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200 px-2 sm:px-0">
+      <div className="bg-white shadow-lg rounded-xl px-2 sm:px-8 py-4 sm:py-8 w-full max-w-3xl flex flex-col items-center">
         <h2 className="text-2xl font-bold text-indigo-700 mb-2">
           Group Quiz Lobby
         </h2>
         <div className="mb-4 text-indigo-600 font-semibold">
           Host: <span className="text-indigo-900">{hostName}</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 w-full">
           {/* Invited Users */}
           <div className="bg-indigo-50 rounded-lg shadow p-4">
             <h3 className="font-bold text-indigo-700 mb-3 flex items-center gap-2">

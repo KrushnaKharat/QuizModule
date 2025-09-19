@@ -90,9 +90,12 @@ function QuizGame() {
 
     // 2. Get user IDs by email
     const emails = inviteEmails.split(",").map((e) => e.trim());
-    const usersRes = await axios.get("https://quizmodule.onrender.com/api/auth/emails", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const usersRes = await axios.get(
+      "https://quizmodule.onrender.com/api/auth/emails",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     const user_ids = usersRes.data
       .filter((u) => emails.includes(u.email))
       .map((u) => u.id);
@@ -114,7 +117,7 @@ function QuizGame() {
   return (
     <form
       onSubmit={handleHost}
-      className="max-w-lg mx-auto bg-white shadow-lg rounded-xl p-8 flex flex-col gap-6 mt-8"
+      className="max-w-lg mx-auto bg-white shadow-lg rounded-xl p-4 sm:p-8 flex flex-col gap-6 mt-4 sm:mt-8 w-full"
     >
       <h2 className="text-2xl font-bold text-indigo-700 mb-2">
         Host a Group Quiz

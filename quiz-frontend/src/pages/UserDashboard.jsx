@@ -173,8 +173,8 @@ function UserDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white pl-6 pr-6 ">
-      <div className="flex items-center justify-between mb-8 border-b-4 border-purple-600 py-4 px-2 rounded-xl shadow">
+    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white pl-2 pr-2 sm:pl-6 sm:pr-6">
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-8 border-b-4 border-purple-600 py-4 px-2 rounded-xl shadow gap-4 sm:gap-0">
         {/* Logo and Brand */}
         <div className="flex items-center ">
           <img

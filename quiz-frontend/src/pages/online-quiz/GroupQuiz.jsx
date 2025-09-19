@@ -86,8 +86,8 @@ const GroupQuiz = () => {
 
   if (submitted)
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200">
-        <div className="bg-white shadow-lg rounded-xl px-8 py-8 w-full max-w-xl flex flex-col items-center">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200 px-2 sm:px-0">
+        <div className="bg-white shadow-lg rounded-xl px-2 sm:px-8 py-4 sm:py-8 w-full max-w-xl flex flex-col items-center">
           <h2 className="text-3xl font-bold mb-4 text-indigo-700">
             Group Quiz Submitted!
           </h2>
@@ -128,8 +128,8 @@ const GroupQuiz = () => {
   const q = questions[current];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200">
-      <div className="bg-white shadow-lg px-8 py-10 w-full max-w-2xl rounded-xl">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200 px-1 sm:px-0">
+      <div className="bg-white shadow-lg px-2 sm:px-8 py-6 sm:py-10 w-full max-w-2xl rounded-xl">
         <h2 className="text-2xl font-bold text-center mb-8 text-indigo-700">
           Group Quiz
         </h2>
