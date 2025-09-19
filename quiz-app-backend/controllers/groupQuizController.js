@@ -66,10 +66,10 @@ exports.getLobby = async (req, res) => {
   const { session_id } = req.params;
   try {
     const result = await pool.query(
-      `SELECT u.id, u.name, qi.status
-       FROM quiz_invitations qi
-       JOIN users u ON qi.user_id = u.id
-       WHERE qi.session_id = $1 AND qi.status = 'accepted'`,
+      `SELECT u.id, u.name, u.email, qi.status
+   FROM quiz_invitations qi
+   JOIN users u ON qi.user_id = u.id
+   WHERE qi.session_id = $1`,
       [session_id]
     );
     res.json(result.rows);
