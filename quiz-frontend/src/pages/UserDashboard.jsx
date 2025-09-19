@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRef } from "react";
+
 import {
   BrowserRouter as Router,
   Routes,
@@ -187,65 +188,69 @@ function UserDashboard() {
           </span>
         </div>
         {/* Title */}
-        <h1 className="text-xl sm:text-2xl font-extrabold text-indigo-700 text-center flex-1">
-          <button
-            className="mt-2 px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg font-bold shadow hover:from-blue-600 hover:to-indigo-700 transition"
-            onClick={() => window.open("https://appliedinsights.in/", "_blank")}
-          >
-            Visit Our Website
-          </button>
-        </h1>
-
-        {/* User Name and Logout */}
-        <div className="flex items-center gap-4 relative">
-          {/* Notification Bell */}
-          <NotificationBell userId={userId} token={token} />
-
-          {/* User Dropdown */}
-          <div className="relative" ref={dropdownRef}>
+        <div className="flex gap-2 ">
+          <div className="flex gap-2">
             <button
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-100 rounded-lg hover:bg-indigo-200 transition font-semibold text-indigo-700"
-              onClick={() => setShowDropdown((prev) => !prev)}
+              className="mt-2 px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg font-bold shadow hover:from-blue-600 hover:to-indigo-700 transition"
+              onClick={() =>
+                window.open("https://appliedinsights.in/", "_blank")
+              }
             >
-              {userName && `Hi, ${userName}`}
-              <svg
-                className="w-4 h-4 ml-1"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
+              Visit Our Website
             </button>
-            {showDropdown && (
-              <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg z-50">
-                <button
-                  className="w-full text-left px-4 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg font-bold shadow  hover:from-blue-600 hover:to-indigo-700 transition"
-                  onClick={() => {
-                    setShowDropdown(false);
-                    navigate("/quizgame");
-                  }}
+            <button
+              className="mt-2 px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg font-bold shadow hover:from-blue-600 hover:to-indigo-700 transition"
+              onClick={() => {
+                setShowDropdown(false);
+                navigate("/quizgame");
+              }}
+            >
+              Host a Quiz
+            </button>
+          </div>
+          <div className="flex items-center gap-4 relative">
+            <div className="relative" ref={dropdownRef}>
+              <button
+                className="flex items-center gap-2 px-4 py-2 bg-indigo-100 rounded-lg hover:bg-indigo-200 transition font-semibold text-indigo-700"
+                onClick={() => setShowDropdown((prev) => !prev)}
+              >
+                {userName && `Hi, ${userName}`}
+                <svg
+                  className="w-4 h-4 ml-1"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
                 >
-                  Host a Quiz
-                </button>
-                <button
-                  className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600"
-                  onClick={() => {
-                    setShowDropdown(false);
-                    handleLogout();
-                  }}
-                >
-                  Logout
-                </button>
-              </div>
-            )}
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+              {showDropdown && (
+                <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg z-50">
+                  <button
+                    className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600"
+                    onClick={() => {
+                      setShowDropdown(false);
+                      handleLogout();
+                    }}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+            {/* Notification Bell */}
+            <NotificationBell userId={userId} token={token} />
+
+            {/* User Dropdown */}
           </div>
         </div>
+
+        {/* User Name and Logout */}
       </div>
       {error && <div className="text-red-600 mb-4">{error}</div>}
       {loading && <div className="text-blue-700 mb-4">Loading...</div>}
