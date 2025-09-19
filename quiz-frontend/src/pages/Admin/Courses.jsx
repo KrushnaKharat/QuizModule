@@ -167,13 +167,7 @@ function Courses({ onEditTopics }) {
               setNewCourse({ ...newCourse, title: e.target.value })
             }
           />
-          {/* <input
-            className="border p-2 rounded w-full"
-            placeholder="Topic"
-            onChange={(e) =>
-              setNewQuiz({ ...newQuiz, description: e.target.value })
-            }
-          /> */}
+         
 
           <button
             className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
@@ -190,12 +184,7 @@ function Courses({ onEditTopics }) {
             <div className="flex hover:bg-indigo-700 justify-between transition w-full p-2 ">
               <div className="font-semibold text-xl">{q.title}</div>
               <div className="flex flex-col gap-2 justify-between h-full">
-                {/* <button
-                  onClick={() => setSelectedCourseId(q.id)}
-                  className="rounded rounded-md text-white cursor-pointer bg-sky-500 p-2"
-                >
-                  Add Topics
-                </button> */}
+                
                 <button
                   className="rounded rounded-md text-white cursor-pointer bg-sky-500 p-2"
                   onClick={() => onEditTopics(q.id)}
@@ -211,27 +200,7 @@ function Courses({ onEditTopics }) {
               </div>
             </div>
             <div className="w-full">
-              {/* {selectedCourseId === q.id && (
-                <div className="bg-white block rounded p-6 shadow mt-4">
-                  <h3 className="text-xl font-semibold mb-4">
-                    Add Topics for {q.title}
-                  </h3>
-                  <input
-                    className="border p-2 rounded"
-                    placeholder="Topic"
-                    value={newTopic.title}
-                    onChange={(e) =>
-                      setNewTopic({ ...newTopic, title: e.target.value })
-                    }
-                  />
-                  <button
-                    className="btn bg-purple-400 p-2 ml-2"
-                    onClick={addTopic}
-                  >
-                    Add Topic
-                  </button>
-                </div>
-              )} */}
+           
             </div>
           </div>
         ))}

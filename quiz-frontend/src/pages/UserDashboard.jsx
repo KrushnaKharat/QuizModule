@@ -15,7 +15,7 @@ function UserDashboard() {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const quizEmojis = ["🐍", "💻", "📊", "📚", "🧮", "🖥️", "🔢", "📝"];
+  const quizEmojis = [{ id: 1, src: "/pictures/image.png" }];
   const token = localStorage.getItem("token");
   const [userId, setUserId] = useState(null);
 
@@ -224,9 +224,17 @@ function UserDashboard() {
                   <h2 className="text-xl font-bold text-indigo-700">
                     {quiz.title}
                   </h2>
-                  <span className="text-3xl">
-                    {quizEmojis[index % quizEmojis.length]}
-                  </span>
+
+                  {quizEmojis.map((e) => (
+                    <div className="flex  justify-end items-center w-full">
+                      <img
+                        src={e.src}
+                        alt="course"
+                        className="h-16 "
+                        srcset=""
+                      />
+                    </div>
+                  ))}
                 </div>
                 <div className="mt-4 text-sm text-indigo-600 font-medium underline transition opacity-100">
                   View Topics →
