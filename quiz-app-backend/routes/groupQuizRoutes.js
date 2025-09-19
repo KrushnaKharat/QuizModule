@@ -29,5 +29,6 @@ router.get(
   authMiddleware,
   groupQuiz.getSessionInfo
 );
+router.get("/results/:session_id", authMiddleware, groupQuiz.getSessionResults);
 
 module.exports = router;

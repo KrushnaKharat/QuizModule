@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import { useCallback } from "react";
 
 const GroupQuiz = () => {
   const { session_id } = useParams();
@@ -15,14 +16,35 @@ const GroupQuiz = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
+  const [allResults, setAllResults] = useState([]);
+
   // Fetch locked questions for this session
+  const fetchResults = useCallback(() => {
+    axios
+      .get(
+        `https://quizmodule.onrender.com/api/groupquiz/results/${session_id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      .then((res) => setAllResults(res.data));
+  }, [session_id, token]);
+
+  useEffect(() => {
+    if (submitted) {
+      fetchResults();
+      const interval = setInterval(fetchResults, 3000); // Poll every 3s
+      return () => clearInterval(interval);
+    }
+  }, [submitted, fetchResults]);
 
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`https://quizmodule.onrender.com/api/groupquiz/questions/${session_id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .get(
+        `https://quizmodule.onrender.com/api/groupquiz/questions/${session_id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
       .then((res) => {
         setQuestions(res.data);
         setLoading(false);
@@ -31,7 +53,7 @@ const GroupQuiz = () => {
       .get("https://quizmodule.onrender.com/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setUser(res.data.id))
+      .then((res) => setUser(res.data))
       .catch(() => setLoading(false));
   }, [session_id, token]);
 
@@ -75,6 +97,25 @@ const GroupQuiz = () => {
               {result?.score}/{result?.total}
             </span>
           </p>
+          <h3 className="text-xl font-bold mt-6 mb-2 text-indigo-700">
+            All Participants' Results
+          </h3>
+          <table className="w-full text-left mb-4">
+            <thead>
+              <tr>
+                <th className="py-1 px-2">Name</th>
+                <th className="py-1 px-2">Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {allResults.map((r) => (
+                <tr key={r.user_id}>
+                  <td className="py-1 px-2">{r.name}</td>
+                  <td className="py-1 px-2">{r.score}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
           <button
             className="mt-4 px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
             onClick={() => navigate("/dashboard")}
@@ -84,7 +125,6 @@ const GroupQuiz = () => {
         </div>
       </div>
     );
-
   const q = questions[current];
 
   return (

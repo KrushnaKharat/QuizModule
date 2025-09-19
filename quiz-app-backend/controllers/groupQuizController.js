@@ -166,3 +166,18 @@ exports.getUserInvitations = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+exports.getSessionResults = async (req, res) => {
+  const { session_id } = req.params;
+  try {
+    const result = await pool.query(
+      `SELECT qr.*, u.name FROM quiz_results qr
+       JOIN users u ON qr.user_id = u.id
+       WHERE qr.session_id = $1`,
+      [session_id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
