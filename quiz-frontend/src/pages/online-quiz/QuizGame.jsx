@@ -186,17 +186,21 @@ function QuizGame() {
       </div>
       <div>
         <label className="block font-semibold mb-1 text-indigo-700">
-          Invite Users (comma-separated emails)
+          Invite Users with Email Id's
         </label>
-        <input
-          type="text"
-          value={emailInput}
-          onChange={handleEmailChange}
-          className="w-full border border-indigo-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          placeholder="Type email to search"
-        />
+        <div className=" w-full flex mb-2">
+          <input
+            type="text"
+            value={emailInput}
+            onChange={handleEmailChange}
+            className="flex-1 min-w-[120px] border border-indigo-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            placeholder="Type email to search"
+            style={{ minWidth: "120px" }}
+          />
+        </div>
+
         {suggestions.length > 0 && (
-          <ul className="bg-white border rounded shadow mt-1 max-h-32 overflow-y-auto">
+          <ul className="bg-white border rounded shadow mt-1 max-h-32 overflow-y-auto z-10 absolute">
             {suggestions.map((email) => (
               <li
                 key={email}
@@ -208,10 +212,36 @@ function QuizGame() {
             ))}
           </ul>
         )}
-        <div className="mt-2 text-sm text-gray-600">
-          Selected: {inviteEmails}
+        <div className="flex flex-wrap gap-2 mb-2">
+          {inviteEmails
+            .split(",")
+            .map((email) => email.trim())
+            .filter((email) => email.length > 0)
+            .map((email) => (
+              <span
+                key={email}
+                className="flex items-center bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-medium shadow"
+              >
+                {email}
+                <button
+                  type="button"
+                  className="ml-2 text-indigo-500 hover:text-red-500 focus:outline-none"
+                  onClick={() => {
+                    const emails = inviteEmails
+                      .split(",")
+                      .map((em) => em.trim())
+                      .filter((em) => em && em !== email);
+                    setInviteEmails(emails.join(", "));
+                  }}
+                  aria-label={`Remove ${email}`}
+                >
+                  &times;
+                </button>
+              </span>
+            ))}
         </div>
       </div>
+
       <button
         type="submit"
         className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-bold text-lg shadow-lg hover:scale-105 transition"

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useRef } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -22,6 +23,21 @@ function UserDashboard() {
   const [topicStats, setTopicStats] = useState({});
   const [userName, setUserName] = useState("");
   const navigate = useNavigate();
+
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef();
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   // Get userId and userName
   useEffect(() => {
@@ -173,31 +189,62 @@ function UserDashboard() {
         {/* Title */}
         <h1 className="text-xl sm:text-2xl font-extrabold text-indigo-700 text-center flex-1">
           <button
-            className="mt-2 px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg font-bold shadow hover:scale-105 hover:from-blue-600 hover:to-indigo-700 transition"
+            className="mt-2 px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg font-bold shadow hover:from-blue-600 hover:to-indigo-700 transition"
             onClick={() => window.open("https://appliedinsights.in/", "_blank")}
           >
             Visit Our Website
           </button>
         </h1>
-        <button
-          className="mt-2 px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg font-bold shadow hover:scale-105 hover:from-blue-600 hover:to-indigo-700 transition"
-          onClick={() => navigate("/quizgame")}
-        >
-          Quiz Game
-        </button>
 
         {/* User Name and Logout */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 relative">
+          {/* Notification Bell */}
           <NotificationBell userId={userId} token={token} />
-          <span className="text-indigo-700 font-semibold text-lg">
-            {userName && `Hi, ${userName}`}
-          </span>
-          <button
-            onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600 transition text-white px-6 py-2 rounded-lg font-semibold shadow"
-          >
-            Logout
-          </button>
+
+          {/* User Dropdown */}
+          <div className="relative" ref={dropdownRef}>
+            <button
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-100 rounded-lg hover:bg-indigo-200 transition font-semibold text-indigo-700"
+              onClick={() => setShowDropdown((prev) => !prev)}
+            >
+              {userName && `Hi, ${userName}`}
+              <svg
+                className="w-4 h-4 ml-1"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            {showDropdown && (
+              <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-lg z-50">
+                <button
+                  className="w-full text-left px-4 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg font-bold shadow  hover:from-blue-600 hover:to-indigo-700 transition"
+                  onClick={() => {
+                    setShowDropdown(false);
+                    navigate("/quizgame");
+                  }}
+                >
+                  Host a Quiz
+                </button>
+                <button
+                  className="w-full text-left px-4 py-2 hover:bg-red-50 text-red-600"
+                  onClick={() => {
+                    setShowDropdown(false);
+                    handleLogout();
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
       {error && <div className="text-red-600 mb-4">{error}</div>}
