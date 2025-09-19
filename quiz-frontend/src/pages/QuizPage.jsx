@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import "./QuizPage.css";
 
 function QuizPage() {
   const [topicTitle, setTopicTitle] = useState("");
@@ -247,11 +246,11 @@ function QuizPage() {
   if (showInstructions) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 w-full">
-        <div className="bg-white rounded-xl shadow-lg p-8  w-1/2 text-center">
+        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-8 w-full max-w-md mx-2 text-center">
           <h2 className="text-2xl font-bold mb-4 text-indigo-700">
             Quiz Instructions
           </h2>
-          <ul className="text-left  mb-6 list-disc list-inside text-gray-700">
+          <ul className="text-left mb-6 list-disc list-inside text-gray-700 text-sm sm:text-base">
             <b>
               <li>Answer all questions within the time limit.</li>
               <li>Once you start, the timer will not pause.</li>
@@ -311,8 +310,8 @@ function QuizPage() {
     const currentResult = resultData[resultCurrent];
 
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 gap-2 to-indigo-200">
-        <div className="bg-white shadow-lg rounded-xl px-8 py-8 w-full max-w-xl flex flex-col items-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200 px-1 sm:px-0">
+        <div className="flex flex-col md:flex-row w-full max-w-6xl">
           <h2 className="text-3xl font-bold mb-4 text-indigo-700">
             {isPractice ? "Practice Quiz Submitted!" : "Quiz Submitted!"}
           </h2>
@@ -343,9 +342,7 @@ function QuizPage() {
           >
             Visit Our Website
           </button>
-          
         </div>
-       
 
         {/* Result Card for Each Question */}
         <div className="bg-white shadow-lg rounded-xl px-8 py-8 w-full max-w-xl flex flex-col items-center">
@@ -464,7 +461,6 @@ function QuizPage() {
           >
             Visit Our Website
           </button>
-         
         </div>
       </div>
     );
@@ -475,10 +471,10 @@ function QuizPage() {
     questions.length > 0 && questions.every((q) => answers[q.id]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200">
-      <div className="flex w-full max-w-6xl">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200 px-1 sm:px-0">
+      <div className="flex flex-col md:flex-row w-full max-w-6xl">
         {/* Left Sidebar */}
-        <div className="bg-indigo-100 rounded-l-xl p-8 flex flex-col items-center justify-center w-1/4">
+        <div className="bg-indigo-100 rounded-t-xl md:rounded-l-xl md:rounded-tr-none p-4 sm:p-8 flex flex-col items-center justify-center w-full md:w-1/4">
           <div className="w-full flex flex-col items-center justify-center mb-4">
             {topicTitle && (
               <div className="text-xl font-bold text-indigo-700 mb-2 flex flex-col justify-center items-center">
@@ -509,12 +505,12 @@ function QuizPage() {
         </div>
 
         {/* Main Content */}
-        <div className="bg-white shadow-lg px-8 py-10 w-2/4">
+        <div className="bg-white shadow-lg px-2 sm:px-8 py-6 sm:py-10 w-full md:w-2/4">
           <h2 className="text-3xl font-bold text-center mb-8 text-indigo-700">
             Quiz
           </h2>
 
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-2">
             <div>
               {!isPractice && (
                 <span className="text-md text-gray-700">
@@ -537,7 +533,7 @@ function QuizPage() {
                 : "--:--"}
             </div>
           </div>
-          <div className="mb-8 p-6 rounded-lg bg-indigo-50 shadow">
+          <div className="mb-8 p-4 sm:p-6 rounded-lg bg-indigo-50 shadow">
             <p className="font-semibold text-lg mb-4 text-indigo-800">
               {q.question_text}
             </p>
@@ -567,7 +563,7 @@ function QuizPage() {
           </div>
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row justify-between gap-2">
             <button
               onClick={handlePrevious}
               disabled={current === 0}
@@ -606,7 +602,7 @@ function QuizPage() {
         </div>
 
         {/* Right Sidebar for Question Navigation */}
-        <div className="bg-indigo-50 rounded-r-xl p-6 w-1/4 flex flex-col items-center justify-between">
+        <div className="bg-indigo-50 rounded-b-xl md:rounded-r-xl md:rounded-bl-none p-4 sm:p-6 w-full md:w-1/4 flex flex-col items-center justify-between">
           <div>
             <h3 className="text-indigo-700 text-lg text-center font-bold mb-4">
               Questions
