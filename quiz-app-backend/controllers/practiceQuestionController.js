@@ -16,6 +16,7 @@ exports.getPracticeQuestionsByTopicId = async (req, res) => {
   }
 };
 
+
 exports.addPracticeQuestionsToTopic = async (req, res) => {
   const { topicId } = req.params;
   const {
@@ -46,7 +47,7 @@ exports.addPracticeQuestionsToTopic = async (req, res) => {
   }
 };
 
-exports.deletePracticeQuestions = async (req, res) => {
+exports.deletePracticeQuestions =  async (req, res) => {
   const { id } = req.params;
   try {
     await pool.query("DELETE FROM practicequestions WHERE id = $1", [id]);
