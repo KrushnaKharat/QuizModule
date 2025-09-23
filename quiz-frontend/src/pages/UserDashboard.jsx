@@ -289,7 +289,7 @@ function UserDashboard() {
                   ))}
                 </div>
                 <div className="mt-4 text-sm text-indigo-600 font-medium underline transition opacity-100 ">
-                  <button className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-fir"> 
+                  <button className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-fir">
                     View Topics →
                   </button>
                 </div>
@@ -331,41 +331,45 @@ function UserDashboard() {
                         </p>
                       </div>
                       <div className="flex flex-col gap-1 mt-2">
-                        <span className="text-green-700 text-sm font-semibold">
+                        <span className="text-indigo-700 flex text-sm font-semibold">
                           Best Score:{" "}
-                          {typeof stats.bestScore === "number"
-                            ? `${stats.bestScore}/10`
-                            : "—"}
+                          <p className="font-bold">{typeof stats.bestScore === "number"
+                            ? ` ${stats.bestScore}/10`
+                            : "—"}</p>
                         </span>
-                        <span className="text-orange-700 text-sm font-semibold">
+                        <span className="text-orange-700 flex text-sm font-semibold">
                           Remaining Attempts:{" "}
-                          {typeof stats.remaining === "number"
-                            ? `${stats.remaining}/${stats.maxAttempts || 3}`
-                            : "—"}
+                          <p className=" font-bold">
+                            {typeof stats.remaining === "number"
+                              ? `${stats.remaining}/${stats.maxAttempts || 3}`
+                              : "—"}
+                          </p>
                         </span>
                       </div>
                     </div>
-                    <div className="flex justify-between mt-2">
-                      <div
-                        className="text-blue-500 font-medium underline cursor-pointer"
+                    <div className="flex justify-between mt-8 ">
+                      <button
+                        className="text-white bg-blue-500 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900"
                         onClick={() =>
                           (window.location.href = `/practicequiz/${topic.id}`)
                         }
                       >
-                        Start Practice Quiz →
-                      </div>
-                      <div
-                        className="text-indigo-600 font-medium underline cursor-pointer"
+                        Start Practice Quiz
+                      </button>
+                      <button
+                        className="text-white bg-indigo-500 hover:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900" 
                         onClick={() =>
                           (window.location.href = `/quiz/${topic.id}`)
                         }
                       >
                         Start Quiz →
-                      </div>
+                      </button>
                     </div>
                   </div>
                 );
               })}
+
+
             </div>
           )}
         </div>
