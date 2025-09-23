@@ -345,7 +345,7 @@ function QuizPage() {
         </div>
 
         {/* Result Card for Each Question */}
-        <div className="bg-white shadow-lg rounded-xl px-8 py-8 w-full max-w-xl flex flex-col items-center">
+        <div className="bg-white shadow-lg rounded-xl px-8 py-8 w-full max-w-xl flex flex-col items-center mt-4">
           <div className="mb-4 w-full">
             <div className="text-lg font-semibold text-indigo-700 mb-2">
               Question {resultCurrent + 1} of {questions.length}
