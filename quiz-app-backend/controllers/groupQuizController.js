@@ -2,14 +2,14 @@ const pool = require("../config/db");
 
 // 1. Create a new group quiz session
 exports.createSession = async (req, res) => {
-  const { host_id, course_id, topic_id, group_name, total_questions } =
+  const { host_id, course_id, topic_id, group_name, total_questions, timer } =
     req.body;
   try {
     // Create session
     const sessionRes = await pool.query(
-      `INSERT INTO quiz_sessions (host_id, course_id, topic_id, group_name, total_questions)
-       VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-      [host_id, course_id, topic_id, group_name, total_questions]
+      `INSERT INTO quiz_sessions (host_id, course_id, topic_id, group_name, total_questions, timer)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`,
+      [host_id, course_id, topic_id, group_name, total_questions,timer]
     );
     const session_id = sessionRes.rows[0].id;
 
@@ -141,7 +141,7 @@ exports.getUserSessions = async (req, res) => {
 exports.getSessionInfo = async (req, res) => {
   const { session_id } = req.params;
   const result = await pool.query(
-    `SELECT qs.status, qs.host_id, u.name as host_name
+    `SELECT qs.status, qs.host_id, u.name as host_name, qs.timer
      FROM quiz_sessions qs
      JOIN users u ON qs.host_id = u.id
      WHERE qs.id = $1`,
@@ -149,7 +149,6 @@ exports.getSessionInfo = async (req, res) => {
   );
   res.json(result.rows[0]);
 };
-
 exports.getUserInvitations = async (req, res) => {
   const { user_id } = req.params;
   try {

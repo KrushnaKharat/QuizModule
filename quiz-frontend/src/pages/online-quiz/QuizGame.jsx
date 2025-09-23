@@ -9,6 +9,7 @@ function QuizGame() {
   const [topic, setTopic] = useState("");
   const [groupName, setGroupName] = useState("");
   const [totalQuestions, setTotalQuestions] = useState(10);
+  const [quizTimer, setQuizTimer] = useState(5); // Timer in minutes, default 10
   const [inviteEmails, setInviteEmails] = useState("");
   const [allEmails, setAllEmails] = useState([]);
   const [emailInput, setEmailInput] = useState("");
@@ -19,17 +20,17 @@ function QuizGame() {
 
   useEffect(() => {
     axios
-      .get("https://quizmodule.onrender.com/api/courses", {
+      .get("http://localhost:5000/api/courses", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setCourses(res.data));
     axios
-      .get("https://quizmodule.onrender.com/api/auth/emails", {
+      .get("http://localhost:5000/api/auth/emails", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setAllEmails(res.data.map((u) => u.email)));
     axios
-      .get("https://quizmodule.onrender.com/api/auth/me", {
+      .get("http://localhost:5000/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setHostId(res.data.id));
@@ -38,7 +39,7 @@ function QuizGame() {
   useEffect(() => {
     if (course) {
       axios
-        .get(`https://quizmodule.onrender.com/api/course/${course}/topics`, {
+        .get(`http://localhost:5000/api/course/${course}/topics`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => setTopics(res.data));
@@ -76,13 +77,14 @@ function QuizGame() {
     e.preventDefault();
     // 1. Create session
     const sessionRes = await axios.post(
-      "https://quizmodule.onrender.com/api/groupquiz/session",
+      "http://localhost:5000/api/groupquiz/session",
       {
         host_id: hostId,
         course_id: course,
         topic_id: topic,
         group_name: groupName,
         total_questions: totalQuestions,
+        timer: quizTimer, // Pass timer to backend
       },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -91,7 +93,7 @@ function QuizGame() {
     // 2. Get user IDs by email
     const emails = inviteEmails.split(",").map((e) => e.trim());
     const usersRes = await axios.get(
-      "https://quizmodule.onrender.com/api/auth/emails",
+      "http://localhost:5000/api/auth/emails",
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -102,7 +104,7 @@ function QuizGame() {
 
     // 3. Invite users
     await axios.post(
-      "https://quizmodule.onrender.com/api/groupquiz/invite",
+      "http://localhost:5000/api/groupquiz/invite",
       {
         session_id,
         user_ids,
@@ -185,6 +187,21 @@ function QuizGame() {
           required
           className="w-full border border-indigo-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
           placeholder="Number of questions"
+        />
+      </div>
+      <div>
+        <label className="block font-semibold mb-1 text-indigo-700">
+          Quiz Timer (minutes)
+        </label>
+        <input
+          type="number"
+          min={1}
+          max={120}
+          value={quizTimer}
+          onChange={(e) => setQuizTimer(Number(e.target.value))}
+          required
+          className="w-full border border-indigo-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          placeholder="Quiz duration in minutes"
         />
       </div>
       <div>
