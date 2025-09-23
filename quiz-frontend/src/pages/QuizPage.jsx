@@ -310,8 +310,8 @@ function QuizPage() {
     const currentResult = resultData[resultCurrent];
 
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200 px-1 sm:px-0">
-        <div className="flex flex-col md:flex-row w-full max-w-6xl">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200 px-1 sm:px-0">
+        <div className="flex flex-col justify-center items-center w-full max-w-6xl">
           <h2 className="text-3xl font-bold mb-4 text-indigo-700">
             {isPractice ? "Practice Quiz Submitted!" : "Quiz Submitted!"}
           </h2>

@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import { useCallback } from "react";
 
 const GroupQuiz = () => {
   const { session_id } = useParams();
@@ -16,13 +15,16 @@ const GroupQuiz = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
+  const [timer, setTimer] = useState(null); // in seconds
+  const [timeLeft, setTimeLeft] = useState(null);
+
   const [allResults, setAllResults] = useState([]);
 
   // Fetch locked questions for this session
   const fetchResults = useCallback(() => {
     axios
       .get(
-        `https://quizmodule.onrender.com/api/groupquiz/results/${session_id}`,
+        `http://localhost:5000/api/groupquiz/results/${session_id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then((res) => setAllResults(res.data));
@@ -40,7 +42,7 @@ const GroupQuiz = () => {
     setLoading(true);
     axios
       .get(
-        `https://quizmodule.onrender.com/api/groupquiz/questions/${session_id}`,
+        `http://localhost:5000/api/groupquiz/questions/${session_id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -50,7 +52,7 @@ const GroupQuiz = () => {
         setLoading(false);
       });
     axios
-      .get("https://quizmodule.onrender.com/api/auth/me", {
+      .get("http://localhost:5000/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setUser(res.data))
@@ -71,7 +73,7 @@ const GroupQuiz = () => {
 
     // Submit result to backend
     await axios.post(
-      "https://quizmodule.onrender.com/api/groupquiz/result",
+      "http://localhost:5000/api/groupquiz/result",
       {
         session_id: session_id,
         user_id: user.id,
@@ -81,6 +83,36 @@ const GroupQuiz = () => {
     );
     setResult({ score: sc, total: questions.length });
   };
+
+  // Fetch timer from backend
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/api/groupquiz/sessioninfo/${session_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        setTimer(res.data.timer * 60); // convert minutes to seconds
+        setTimeLeft(res.data.timer * 60);
+      });
+  }, [session_id, token]);
+
+  // Timer effect
+  useEffect(() => {
+    if (timer && !submitted && questions.length > 0) {
+      setTimeLeft(timer);
+      const interval = setInterval(() => {
+        setTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            handleSubmit(); // auto-submit
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [timer, submitted, questions.length]);
 
   if (loading) return <div className="p-8 text-lg">Loading quiz...</div>;
 
@@ -133,6 +165,17 @@ const GroupQuiz = () => {
         <h2 className="text-2xl font-bold text-center mb-8 text-indigo-700">
           Group Quiz
         </h2>
+        <div className="flex justify-end mb-4">
+          <div className="text-lg font-bold text-red-600">
+            Time Left:{" "}
+            {timeLeft !== null
+              ? `${Math.floor(timeLeft / 60)}:${String(timeLeft % 60).padStart(
+                  2,
+                  "0"
+                )}`
+              : "--:--"}
+          </div>
+        </div>
         <div className="mb-8 p-6 rounded-lg bg-indigo-50 shadow">
           <div className="font-semibold text-lg mb-4 text-indigo-800">
             Q{current + 1}: {q.question_text}
@@ -165,9 +208,8 @@ const GroupQuiz = () => {
           <button
             onClick={() => setCurrent((prev) => prev - 1)}
             disabled={current === 0}
-            className={`px-6 py-3 rounded-lg bg-gray-300 text-black font-semibold hover:bg-gray-400 transition ${
-              current === 0 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`px-6 py-3 rounded-lg bg-gray-300 text-black font-semibold hover:bg-gray-400 transition ${current === 0 ? "opacity-50 cursor-not-allowed" : ""
+              }`}
           >
             Previous
           </button>
@@ -175,9 +217,8 @@ const GroupQuiz = () => {
             <button
               onClick={() => setCurrent((prev) => prev + 1)}
               disabled={!answers[q.id]}
-              className={`px-6 py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition ${
-                !answers[q.id] ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+              className={`px-6 py-3 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition ${!answers[q.id] ? "opacity-50 cursor-not-allowed" : ""
+                }`}
             >
               Next
             </button>
@@ -186,10 +227,9 @@ const GroupQuiz = () => {
               onClick={handleSubmit}
               disabled={Object.keys(answers).length !== questions.length}
               className={`px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition 
-                ${
-                  Object.keys(answers).length !== questions.length
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
+                ${Object.keys(answers).length !== questions.length
+                  ? "opacity-50 cursor-not-allowed"
+                  : ""
                 }`}
             >
               Submit Quiz
