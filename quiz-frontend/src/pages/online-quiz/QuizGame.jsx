@@ -20,17 +20,17 @@ function QuizGame() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/courses", {
+      .get("https://quizmodule.onrender.com/api/courses", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setCourses(res.data));
     axios
-      .get("http://localhost:5000/api/auth/emails", {
+      .get("https://quizmodule.onrender.com/api/auth/emails", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setAllEmails(res.data.map((u) => u.email)));
     axios
-      .get("http://localhost:5000/api/auth/me", {
+      .get("https://quizmodule.onrender.com/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setHostId(res.data.id));
@@ -39,7 +39,7 @@ function QuizGame() {
   useEffect(() => {
     if (course) {
       axios
-        .get(`http://localhost:5000/api/course/${course}/topics`, {
+        .get(`https://quizmodule.onrender.com/api/course/${course}/topics`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => setTopics(res.data));
@@ -77,7 +77,7 @@ function QuizGame() {
     e.preventDefault();
     // 1. Create session
     const sessionRes = await axios.post(
-      "http://localhost:5000/api/groupquiz/session",
+      "https://quizmodule.onrender.com/api/groupquiz/session",
       {
         host_id: hostId,
         course_id: course,
@@ -93,7 +93,7 @@ function QuizGame() {
     // 2. Get user IDs by email
     const emails = inviteEmails.split(",").map((e) => e.trim());
     const usersRes = await axios.get(
-      "http://localhost:5000/api/auth/emails",
+      "https://quizmodule.onrender.com/api/auth/emails",
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -104,7 +104,7 @@ function QuizGame() {
 
     // 3. Invite users
     await axios.post(
-      "http://localhost:5000/api/groupquiz/invite",
+      "https://quizmodule.onrender.com/api/groupquiz/invite",
       {
         session_id,
         user_ids,

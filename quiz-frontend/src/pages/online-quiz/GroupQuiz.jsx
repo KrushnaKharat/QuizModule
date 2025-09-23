@@ -24,7 +24,7 @@ const GroupQuiz = () => {
   const fetchResults = useCallback(() => {
     axios
       .get(
-        `http://localhost:5000/api/groupquiz/results/${session_id}`,
+        `https://quizmodule.onrender.com/api/groupquiz/results/${session_id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then((res) => setAllResults(res.data));
@@ -42,7 +42,7 @@ const GroupQuiz = () => {
     setLoading(true);
     axios
       .get(
-        `http://localhost:5000/api/groupquiz/questions/${session_id}`,
+        `https://quizmodule.onrender.com/api/groupquiz/questions/${session_id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -52,7 +52,7 @@ const GroupQuiz = () => {
         setLoading(false);
       });
     axios
-      .get("http://localhost:5000/api/auth/me", {
+      .get("https://quizmodule.onrender.com/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setUser(res.data))
@@ -73,7 +73,7 @@ const GroupQuiz = () => {
 
     // Submit result to backend
     await axios.post(
-      "http://localhost:5000/api/groupquiz/result",
+      "https://quizmodule.onrender.com/api/groupquiz/result",
       {
         session_id: session_id,
         user_id: user.id,
@@ -87,7 +87,7 @@ const GroupQuiz = () => {
   // Fetch timer from backend
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/groupquiz/sessioninfo/${session_id}`, {
+      .get(`https://quizmodule.onrender.com/api/groupquiz/sessioninfo/${session_id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
