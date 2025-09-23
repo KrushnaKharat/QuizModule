@@ -1,4 +1,7 @@
 const pool = require("../config/db");
+const fs = require("fs");
+const csv = require("csv-parser");
+const xlsx = require("xlsx");
 
 exports.getPracticeQuestionsByTopicId = async (req, res) => {
   const { topicId } = req.params;
