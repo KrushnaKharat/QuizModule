@@ -23,7 +23,7 @@ function NotificationBell({ userId, token, onRespond }) {
         });
     };
     fetchInvites();
-    const interval = setInterval(fetchInvites, 10000);
+    const interval = setInterval(fetchInvites, 1000);
     return () => clearInterval(interval);
   }, [userId, token]);
 
