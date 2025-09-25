@@ -318,18 +318,34 @@ function Users({ token }) {
                 className="border p-2 rounded"
                 required
               />
-              <select
-                multiple
-                value={editUser.courses}
-                onChange={handleEditCourseSelect}
-                className="border p-2 rounded"
-              >
+              <div className="flex flex-col gap-2 max-h-40 overflow-y-auto border rounded p-2">
                 {courses.map((course) => (
-                  <option key={course.id} value={course.id}>
+                  <label key={course.id} className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={editUser.courses.includes(course.id)}
+                      onChange={() => {
+                        setEditUser((prev) => {
+                          if (prev.courses.includes(course.id)) {
+                            return {
+                              ...prev,
+                              courses: prev.courses.filter(
+                                (id) => id !== course.id
+                              ),
+                            };
+                          } else {
+                            return {
+                              ...prev,
+                              courses: [...prev.courses, course.id],
+                            };
+                          }
+                        });
+                      }}
+                    />
                     {course.title}
-                  </option>
+                  </label>
                 ))}
-              </select>
+              </div>
               <div className="flex gap-2 mt-4">
                 <button
                   type="submit"
