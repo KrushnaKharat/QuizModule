@@ -1,32 +1,25 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRef } from "react";
-
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useNavigate,
-  Navigate,
-} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import NotificationBell from "./NotificationBell";
 
 function UserDashboard() {
-  const [quizzes, setQuizzes] = useState([]);
+  const [allCourses, setAllCourses] = useState([]);
+  const [userCourses, setUserCourses] = useState([]);
   const [topics, setTopics] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const quizEmojis = [{ id: 1, src: "/pictures/image.png" }];
-  const token = localStorage.getItem("token");
-  const [userId, setUserId] = useState(null);
-
   const [topicStats, setTopicStats] = useState({});
   const [userName, setUserName] = useState("");
-  const navigate = useNavigate();
-
+  const [userId, setUserId] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef();
+  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+  const [showLockPrompt, setShowLockPrompt] = useState(false);
+  const [lockedCourse, setLockedCourse] = useState(null);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -35,9 +28,7 @@ function UserDashboard() {
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Get userId and userName
@@ -58,6 +49,20 @@ function UserDashboard() {
     }
   }, [token]);
 
+  // Fetch all courses
+  useEffect(() => {
+    if (token) {
+      axios
+        .get("https://quizmodule.onrender.com/api/courses", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) =>
+          setAllCourses(res.data.map((c) => ({ ...c, id: Number(c.id) })))
+        )
+        .catch(() => setError("Failed to fetch all courses."));
+    }
+  }, [token]);
+
   // Fetch only user's assigned courses
   useEffect(() => {
     if (userId) {
@@ -70,7 +75,7 @@ function UserDashboard() {
           }
         )
         .then((res) =>
-          setQuizzes(res.data.map((c) => ({ ...c, id: Number(c.id) })))
+          setUserCourses(res.data.map((c) => ({ ...c, id: Number(c.id) })))
         )
         .catch(() => setError("Failed to fetch your courses."))
         .finally(() => setLoading(false));
@@ -97,7 +102,6 @@ function UserDashboard() {
   // Fetch topic stats (best score and remaining attempts) for each topic
   useEffect(() => {
     if (selectedCourse && topics.length > 0 && userId) {
-      // Fetch stats for all topics in parallel
       Promise.all(
         topics.map((topic) =>
           axios
@@ -117,7 +121,6 @@ function UserDashboard() {
             }))
         )
       ).then((attemptsArr) => {
-        // Fetch best score for each topic
         Promise.all(
           topics.map((topic) =>
             axios
@@ -126,7 +129,6 @@ function UserDashboard() {
                 { headers: { Authorization: `Bearer ${token}` } }
               )
               .then((res) => {
-                // Find best score for this topic
                 const attempts = res.data.filter(
                   (a) => a.topic_id === topic.id && a.user_id === userId
                 );
@@ -139,7 +141,6 @@ function UserDashboard() {
               .catch(() => ({ topicId: topic.id, bestScore: null }))
           )
         ).then((scoresArr) => {
-          // Merge attempts and scores
           const stats = {};
           attemptsArr.forEach((a) => {
             stats[a.topicId] = {
@@ -157,9 +158,11 @@ function UserDashboard() {
     }
   }, [topics, selectedCourse, userId, token]);
 
-  const handleCourseClick = (course) => {
-    setSelectedCourse(course);
-    setError("");
+  const handleCourseClick = (course, isUnlocked) => {
+    if (isUnlocked) {
+      setSelectedCourse(course);
+      setError("");
+    }
   };
 
   const handleBackToCourses = () => {
@@ -172,6 +175,10 @@ function UserDashboard() {
     localStorage.clear();
     window.location.href = "/";
   };
+
+  // Helper: check if course is unlocked for user
+  const isCourseUnlocked = (courseId) =>
+    userCourses.some((c) => c.id === courseId);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white pl-2 pr-2 sm:pl-6 sm:pr-6">
@@ -245,56 +252,80 @@ function UserDashboard() {
             </div>
             {/* Notification Bell */}
             <NotificationBell userId={userId} token={token} />
-
-            {/* User Dropdown */}
           </div>
         </div>
-
-        {/* User Name and Logout */}
       </div>
       {error && <div className="text-red-600 mb-4">{error}</div>}
       {loading && <div className="text-blue-700 mb-4">Loading...</div>}
 
       {!selectedCourse ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {quizzes.length === 0 ? (
-            <div className="text-gray-600">No purchased courses found.</div>
+          {allCourses.length === 0 ? (
+            <div className="text-gray-600">No courses found.</div>
           ) : (
-            quizzes.map((quiz, index) => (
-              <div
-                key={quiz.id}
-                onClick={() => handleCourseClick(quiz)}
-                className="group bg-white rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.03] transform transition duration-300 p-6 cursor-pointer"
-                style={{
-                  animation: "fadeInUp 0.7s ease forwards",
-                  animationDelay: `${index * 120}ms`,
-                  opacity: 0,
-                  pointerEvents: "auto",
-                }}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold text-indigo-700">
-                    {quiz.title}
-                  </h2>
-
-                  {quizEmojis.map((e) => (
-                    <div className="flex  justify-end items-center w-full">
+            allCourses.map((course, index) => {
+              const unlocked = isCourseUnlocked(course.id);
+              return (
+                <div
+                  key={course.id}
+                  onClick={() => handleCourseClick(course, unlocked)}
+                  className={`group bg-white rounded-xl shadow-lg transition duration-300 p-6 cursor-pointer relative ${
+                    unlocked
+                      ? "hover:shadow-xl hover:scale-[1.03]"
+                      : "opacity-60 cursor-not-allowed"
+                  }`}
+                  style={{
+                    animation: "fadeInUp 0.7s ease forwards",
+                    animationDelay: `${index * 120}ms`,
+                    opacity: 0,
+                    pointerEvents: "auto",
+                  }}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold text-indigo-700">
+                      {course.title}
+                    </h2>
+                    {unlocked ? (
                       <img
-                        src={e.src}
+                        src="/pictures/image.png"
                         alt="course"
-                        className="h-16 "
-                        srcset=""
+                        className="h-16"
                       />
-                    </div>
-                  ))}
+
+                    ) : (
+                      <span
+                        title="Locked"
+                        className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-gray-200 text-gray-500 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setLockedCourse(course);
+                          setShowLockPrompt(true);
+                        }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={2}
+                          stroke="currentColor"
+                          className="w-6 h-6"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M16.5 10.5V7a4.5 4.5 0 00-9 0v3.5M5.25 10.5h13.5A2.25 2.25 0 0121 12.75v6A2.25 2.25 0 0118.75 21H5.25A2.25 2.25 0 013 18.75v-6A2.25 2.25 0 015.25 10.5z"
+                          />
+                        </svg>
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-4 text-sm text-indigo-600 font-medium underline transition opacity-100">
+                    {unlocked ? "View Topics →" : "Locked"}
+                  </div>
+
                 </div>
-                <div className="mt-4 text-sm text-indigo-600 font-medium underline transition opacity-100 ">
-                  <button className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 w-fir">
-                    View Topics →
-                  </button>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       ) : (
@@ -372,6 +403,32 @@ function UserDashboard() {
 
             </div>
           )}
+        </div>
+      )}
+      {showLockPrompt && lockedCourse && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
+            <h2 className="text-xl font-bold text-indigo-700 mb-4">
+              {lockedCourse.title} is Locked
+            </h2>
+            <p className="mb-4 text-gray-700">
+              This course is currently locked for your account.
+              <br />
+              <span className="font-semibold text-indigo-600">
+                To unlock this course, please contact your administrator or
+                course manager.
+              </span>
+              <br />
+              You may also check if you need to complete prerequisites or
+              request access from your instructor.
+            </p>
+            <button
+              className="mt-2 px-6 py-2 bg-indigo-500 text-white rounded-lg font-bold shadow hover:bg-indigo-700 transition"
+              onClick={() => setShowLockPrompt(false)}
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
     </div>
