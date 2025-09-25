@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./Login.css";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -17,6 +16,14 @@ function Login() {
   const [isSignup, setIsSignup] = useState(false);
   const navigate = useNavigate();
 
+  const validateEmail = (email) => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
+const validateMobile = (mobile) => {
+  return /^\d{10}$/.test(mobile);
+};
+
   // Autofill email after signup
   useEffect(() => {
     if (!isSignup) {
@@ -29,51 +36,62 @@ function Login() {
   }, [isSignup]);
 
   const handleLogin = async () => {
-    setErrorMsg("");
-    try {
-      const res = await axios.post(
-        "https://quizmodule.onrender.com/api/auth/login",
-        {
-          email,
-          password,
-        }
-      );
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.role);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
-      navigate(res.data.role === "admin" ? "/admin" : "/dashboard");
-    } catch (err) {
-      setErrorMsg("Invalid email or password");
-    }
-  };
+  setErrorMsg("");
+  if (!validateEmail(email)) {
+    setErrorMsg("Please enter a valid email address.");
+    return;
+  }
+  try {
+    const res = await axios.post(
+      "https://quizmodule.onrender.com/api/auth/login",
+      {
+        email,
+        password,
+      }
+    );
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("role", res.data.role);
+    localStorage.setItem("user", JSON.stringify(res.data.user));
+    navigate(res.data.role === "admin" ? "/admin" : "/dashboard");
+  } catch (err) {
+    setErrorMsg("Invalid email or password");
+  }
+};
 
   const handleSignup = async () => {
-    setSignupError("");
-    setSignupSuccess("");
-    try {
-      await axios.post("https://quizmodule.onrender.com/api/auth/register", {
-        name: signupName,
-        email: signupEmail,
-        password: signupPassword,
-        mobile: signupMobile, // <-- send mobile
-        role: "user",
-        courses: [2], // Always assign Python course (id 2)
-      });
-      setSignupSuccess("🎉 Registration successful! You can now log in.");
-      // Store email for autofill on login
-      localStorage.setItem("lastSignupEmail", signupEmail);
-      setIsSignup(false);
-      setSignupName("");
-      setSignupEmail("");
-      setSignupMobile(""); // <-- clear mobile
-      setSignupPassword("");
-    } catch (err) {
-      setSignupError(
-        err.response?.data?.msg ||
-          "Registration failed. Email may already be in use."
-      );
-    }
-  };
+  setSignupError("");
+  setSignupSuccess("");
+  if (!validateEmail(signupEmail)) {
+    setSignupError("Please enter a valid email address.");
+    return;
+  }
+  if (!validateMobile(signupMobile)) {
+    setSignupError("Mobile number must be exactly 10 digits.");
+    return;
+  }
+  try {
+    await axios.post("https://quizmodule.onrender.com/api/auth/register", {
+      name: signupName,
+      email: signupEmail,
+      password: signupPassword,
+      mobile: signupMobile,
+      role: "user",
+      courses: [2],
+    });
+    setSignupSuccess("🎉 Registration successful! You can now log in.");
+    localStorage.setItem("lastSignupEmail", signupEmail);
+    setIsSignup(false);
+    setSignupName("");
+    setSignupEmail("");
+    setSignupMobile("");
+    setSignupPassword("");
+  } catch (err) {
+    setSignupError(
+      err.response?.data?.msg ||
+        "Registration failed. Email may already be in use."
+    );
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-400 via-blue-200 to-purple-200">

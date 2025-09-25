@@ -9,6 +9,7 @@ function QuizGame() {
   const [topic, setTopic] = useState("");
   const [groupName, setGroupName] = useState("");
   const [totalQuestions, setTotalQuestions] = useState(10);
+  const [quizTimer, setQuizTimer] = useState(5); // Timer in minutes, default 10
   const [inviteEmails, setInviteEmails] = useState("");
   const [allEmails, setAllEmails] = useState([]);
   const [emailInput, setEmailInput] = useState("");
@@ -83,6 +84,7 @@ function QuizGame() {
         topic_id: topic,
         group_name: groupName,
         total_questions: totalQuestions,
+        timer: quizTimer, // Pass timer to backend
       },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -90,9 +92,12 @@ function QuizGame() {
 
     // 2. Get user IDs by email
     const emails = inviteEmails.split(",").map((e) => e.trim());
-    const usersRes = await axios.get("https://quizmodule.onrender.com/api/auth/emails", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const usersRes = await axios.get(
+      "https://quizmodule.onrender.com/api/auth/emails",
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
     const user_ids = usersRes.data
       .filter((u) => emails.includes(u.email))
       .map((u) => u.id);
@@ -114,7 +119,7 @@ function QuizGame() {
   return (
     <form
       onSubmit={handleHost}
-      className="max-w-lg mx-auto bg-white shadow-lg rounded-xl p-8 flex flex-col gap-6 mt-8"
+      className="max-w-lg mx-auto bg-white shadow-lg rounded-xl p-4 sm:p-8 flex flex-col gap-6 mt-4 sm:mt-8 w-full"
     >
       <h2 className="text-2xl font-bold text-indigo-700 mb-2">
         Host a Group Quiz
@@ -182,6 +187,21 @@ function QuizGame() {
           required
           className="w-full border border-indigo-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
           placeholder="Number of questions"
+        />
+      </div>
+      <div>
+        <label className="block font-semibold mb-1 text-indigo-700">
+          Quiz Timer (minutes)
+        </label>
+        <input
+          type="number"
+          min={1}
+          max={120}
+          value={quizTimer}
+          onChange={(e) => setQuizTimer(Number(e.target.value))}
+          required
+          className="w-full border border-indigo-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+          placeholder="Quiz duration in minutes"
         />
       </div>
       <div>
