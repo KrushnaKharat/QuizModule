@@ -9,7 +9,7 @@ function QuizGame() {
   const [topic, setTopic] = useState("");
   const [groupName, setGroupName] = useState("");
   const [totalQuestions, setTotalQuestions] = useState(10);
-  const [quizTimer, setQuizTimer] = useState(5); // Timer in minutes, default 10
+  const [quizTimer, setQuizTimer] = useState(5);
   const [inviteEmails, setInviteEmails] = useState("");
   const [allEmails, setAllEmails] = useState([]);
   const [emailInput, setEmailInput] = useState("");
@@ -18,22 +18,27 @@ function QuizGame() {
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
+  // Fetch hostId and allocated courses
   useEffect(() => {
     axios
-      .get("https://quizmodule.onrender.com/api/courses", {
+      .get("https://quizmodule.onrender.com/api/auth/me", {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setCourses(res.data));
+      .then((res) => {
+        setHostId(res.data.id);
+        // Fetch only allocated courses for this user
+        axios
+          .get(
+            `https://quizmodule.onrender.com/api/auth/users/${res.data.id}/courses`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          )
+          .then((courseRes) => setCourses(courseRes.data));
+      });
     axios
       .get("https://quizmodule.onrender.com/api/auth/emails", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setAllEmails(res.data.map((u) => u.email)));
-    axios
-      .get("https://quizmodule.onrender.com/api/auth/me", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setHostId(res.data.id));
   }, [token]);
 
   useEffect(() => {
@@ -84,7 +89,7 @@ function QuizGame() {
         topic_id: topic,
         group_name: groupName,
         total_questions: totalQuestions,
-        timer: quizTimer, // Pass timer to backend
+        timer: quizTimer,
       },
       { headers: { Authorization: `Bearer ${token}` } }
     );

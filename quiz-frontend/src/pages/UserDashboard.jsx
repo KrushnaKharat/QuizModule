@@ -289,7 +289,10 @@ function UserDashboard() {
                       <img
                         src="/pictures/image.png"
                         alt="course"
-                        className="h-16"
+
+                        className="h-16 "
+                        srcSet=""
+
                       />
 
                     ) : (
