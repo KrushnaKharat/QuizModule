@@ -283,7 +283,7 @@ function UserDashboard() {
                         src={e.src}
                         alt="course"
                         className="h-16 "
-                        srcset=""
+                        srcSet=""
                       />
                     </div>
                   ))}
