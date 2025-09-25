@@ -49,6 +49,49 @@ function UserDashboard() {
     }
   }, [token]);
 
+  const courseImages = [
+    {
+      id: 2,
+      src: "public/pictures/image.png",
+    },
+    {
+      id: 4,
+      src: "public/pictures/statistics.png",
+    },
+    {
+      id: 5,
+      src: "public/pictures/powerbi.png",
+    },
+    {
+      id: 6,
+      src: "public/pictures/sql.png",
+    },
+    {
+      id: 7,
+      src: "public/pictures/excel.png",
+    },
+    {
+      id: 8,
+      src: "public/pictures/datapre.png",
+    },
+    {
+      id: 9,
+      src: "public/pictures/machine.png",
+    },
+    {
+      id: 10,
+      src: "public/pictures/deep.png",
+    },
+    {
+      id: 11,
+      src: "public/pictures/genai.png",
+    },
+    {
+      id: 12,
+      src: "public/pictures/nlp.png",
+    },
+  ];
+
   // Fetch all courses
   useEffect(() => {
     if (token) {
@@ -287,14 +330,18 @@ function UserDashboard() {
                     </h2>
                     {unlocked ? (
                       <img
-                        src="/pictures/image.png"
-                        alt="course"
-
-                        className="h-16 "
+                        src={(() => {
+                          const imgObj = courseImages.find(
+                            (img) => img.id === course.id
+                          );
+                          return imgObj
+                            ? `/${imgObj.src.replace(/^public\//, "")}`
+                            : "/pictures/image.png";
+                        })()}
+                        alt={course.title}
+                        className="h-16"
                         srcSet=""
-
                       />
-
                     ) : (
                       <span
                         title="Locked"
@@ -325,7 +372,6 @@ function UserDashboard() {
                   <div className="mt-4 text-sm text-indigo-600 font-medium underline transition opacity-100">
                     {unlocked ? "View Topics →" : "Locked"}
                   </div>
-
                 </div>
               );
             })
@@ -367,9 +413,11 @@ function UserDashboard() {
                       <div className="flex flex-col gap-1 mt-2">
                         <span className="text-indigo-700 flex text-sm font-semibold">
                           Best Score:{" "}
-                          <p className="font-bold">{typeof stats.bestScore === "number"
-                            ? ` ${stats.bestScore}/10`
-                            : "—"}</p>
+                          <p className="font-bold">
+                            {typeof stats.bestScore === "number"
+                              ? ` ${stats.bestScore}/10`
+                              : "—"}
+                          </p>
                         </span>
                         <span className="text-orange-700 flex text-sm font-semibold">
                           Remaining Attempts:{" "}
@@ -391,7 +439,7 @@ function UserDashboard() {
                         Start Practice Quiz
                       </button>
                       <button
-                        className="text-white bg-indigo-500 hover:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900" 
+                        className="text-white bg-indigo-500 hover:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900"
                         onClick={() =>
                           (window.location.href = `/quiz/${topic.id}`)
                         }
@@ -402,8 +450,6 @@ function UserDashboard() {
                   </div>
                 );
               })}
-
-
             </div>
           )}
         </div>
