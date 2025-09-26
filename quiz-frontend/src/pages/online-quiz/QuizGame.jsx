@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Loader from "../Loader";
 
 // Helper to fetch course and topic names by ID
 const getCourseName = async (id, token) => {
@@ -26,14 +27,18 @@ const getTopicName = async (courseId, topicId, token) => {
   }
 };
 
-// Previous group quizzes component
 function UserGroupQuizzes({ userId, token }) {
   const [quizzes, setQuizzes] = useState([]);
   const [selectedQuizId, setSelectedQuizId] = useState(null);
   const [participants, setParticipants] = useState({});
   const [loadingParticipants, setLoadingParticipants] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(10);
+  const [loadingMore, setLoadingMore] = useState(false);
+   const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
+    setLoading(true);
     if (!userId) return;
     axios
       .get(
@@ -41,13 +46,12 @@ function UserGroupQuizzes({ userId, token }) {
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then(async (res) => {
-        // For each quiz, fetch course/topic names and top score/scorer
+        // Sort by latest (assuming quiz.id is incremental, otherwise use created_at)
+        const sorted = [...res.data].sort((a, b) => b.id - a.id);
         const quizzesWithDetails = await Promise.all(
-          res.data.map(async (quiz) => {
+          sorted.map(async (quiz) => {
             const courseName = quiz.course_name || await getCourseName(quiz.course_id, token);
             const topicName = quiz.topic_name || await getTopicName(quiz.course_id, quiz.topic_id, token);
-
-            // Fetch top score and scorer
             let topScore = null;
             let topUser = null;
             try {
@@ -62,7 +66,7 @@ function UserGroupQuizzes({ userId, token }) {
                 topScore = maxScore;
                 topUser = top ? top.name : null;
               }
-            } catch { }
+            } catch {}
             return {
               ...quiz,
               courseName,
@@ -74,13 +78,13 @@ function UserGroupQuizzes({ userId, token }) {
           })
         );
         setQuizzes(quizzesWithDetails);
+        setLoading(false);
       });
   }, [userId, token]);
 
-  // When a quiz is clicked, fetch all participants and their scores
   const handleQuizClick = async (quiz) => {
     setSelectedQuizId(selectedQuizId === quiz.id ? null : quiz.id);
-    if (selectedQuizId === quiz.id) return; // collapse if already open
+    if (selectedQuizId === quiz.id) return;
     setLoadingParticipants(true);
     try {
       const resultsRes = await axios.get(
@@ -100,10 +104,19 @@ function UserGroupQuizzes({ userId, token }) {
     setLoadingParticipants(false);
   };
 
+  const handleShowMore = () => {
+    setLoadingMore(true);
+    setTimeout(() => {
+      setVisibleCount((prev) => prev + 10);
+      setLoadingMore(false);
+    }, 400); // Simulate loading
+  };
+
   if (!userId) return null;
+  if (loading) return <Loader text="Loading quizzes..." />;
 
   return (
-    <div className="bg-white shadow-xl rounded-2xl p-6 mb-6">
+    <div className="bg-white shadow-xl rounded-2xl p-6 mb-6 w-full">
       <h2 className="text-2xl font-extrabold text-indigo-700 mb-4 flex items-center gap-2">
         <span className="inline-block w-2 h-8 bg-indigo-400 rounded-full mr-2"></span>
         Previous Group Quizzes
@@ -113,100 +126,114 @@ function UserGroupQuizzes({ userId, token }) {
           No previous group quizzes found.
         </div>
       ) : (
-        <table className="w-full text-left mb-4 rounded-lg overflow-hidden">
-          <thead className="bg-indigo-100">
-            <tr>
-              <th className="py-2 px-3 font-semibold">Group Name</th>
-              <th className="py-2 px-3 font-semibold">Course</th>
-              <th className="py-2 px-3 font-semibold">Topic</th>
-              <th className="py-2 px-3 font-semibold">Type</th>
-              <th className="py-2 px-3 font-semibold">Top Score</th>
-              <th className="py-2 px-3 font-semibold">Top Scorer</th>
-            </tr>
-          </thead>
-          <tbody>
-            {quizzes.map((q) => (
-              <React.Fragment key={q.id}>
-                <tr
-                  className={`cursor-pointer transition hover:bg-indigo-50 ${selectedQuizId === q.id ? "bg-indigo-50" : ""
-                    }`}
-                  onClick={() => handleQuizClick(q)}
-                >
-                  <td className="py-2 px-3 font-medium">{q.group_name}</td>
-                  <td className="py-2 px-3">{q.courseName}</td>
-                  <td className="py-2 px-3">{q.topicName}</td>
-                  <td className="py-2 px-3">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-bold ${q.isHost
+        <>
+         
+          <table className="w-full text-left mb-4 rounded-lg overflow-hidden">
+            <thead className="bg-indigo-100">
+              <tr>
+                <th className="py-2 px-3 font-semibold ">Group Name</th>
+                <th className="py-2 px-3 font-semibold">Course</th>
+                <th className="py-2 px-3 font-semibold">Topic</th>
+                <th className="py-2 px-3 font-semibold">Type</th>
+                <th className="py-2 px-3 font-semibold">Top Score</th>
+                <th className="py-2 px-3 font-semibold">Top Scorer</th>
+              </tr>
+            </thead>
+            <tbody>
+              {quizzes.slice(0, visibleCount).map((q) => (
+                <React.Fragment key={q.id}>
+                  <tr
+                    className={`cursor-pointer transition hover:bg-indigo-50 ${selectedQuizId === q.id ? "bg-indigo-50" : ""}`}
+                    onClick={() => handleQuizClick(q)}
+                  >
+                    <td className="py-2 px-3 font-medium">{q.group_name}</td>
+                    <td className="py-2 px-3">{q.courseName}</td>
+                    <td className="py-2 px-3">{q.topicName}</td>
+                    <td className="py-2 px-3">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-bold ${q.isHost
                           ? "bg-indigo-200 text-indigo-800"
                           : "bg-green-100 text-green-800"
                         }`}
-                    >
-                      {q.isHost ? "Hosted" : "Joined"}
-                    </span>
-                  </td>
-                  <td className="py-2 px-3">
-                    {q.topScore !== null ? (
-                      <span className="font-bold text-indigo-700">
-                        {q.topScore}
+                      >
+                        {q.isHost ? "Hosted" : "Joined"}
                       </span>
-                    ) : (
-                      "-"
-                    )}
-                  </td>
-                  <td className="py-2 px-3">
-                    {q.topUser ? (
-                      <span className="font-semibold text-indigo-600">
-                        {q.topUser}
-                      </span>
-                    ) : (
-                      "-"
-                    )}
-                  </td>
-                </tr>
-                {selectedQuizId === q.id && (
-                  <tr>
-                    <td colSpan={6} className="bg-indigo-50">
-                      <div className="p-4">
-                        <h3 className="font-bold text-indigo-700 mb-2">
-                          Participants & Scores
-                        </h3>
-                        {loadingParticipants ? (
-                          <div className="text-gray-500">Loading...</div>
-                        ) : participants[q.id]?.length === 0 ? (
-                          <div className="text-gray-500">No results yet.</div>
-                        ) : (
-                          <table className="w-full text-left rounded">
-                            <thead>
-                              <tr>
-                                <th className="py-1 px-2">Name</th>
-                                <th className="py-1 px-2">Score</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {participants[q.id]?.map((p) => (
-                                <tr key={p.user_id}>
-                                  <td className="py-1 px-2">{p.name}</td>
-                                  <td className="py-1 px-2 font-bold text-indigo-700">
-                                    {p.score}
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        )}
-                      </div>
+                    </td>
+                    <td className="py-2 px-3">
+                      {q.topScore !== null ? (
+                        <span className="font-bold text-indigo-700">
+                          {q.topScore}
+                        </span>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                    <td className="py-2 px-3">
+                      {q.topUser ? (
+                        <span className="font-semibold text-indigo-600">
+                          {q.topUser}
+                        </span>
+                      ) : (
+                        "-"
+                      )}
                     </td>
                   </tr>
-                )}
-              </React.Fragment>
-            ))}
-          </tbody>
-        </table>
+                  {selectedQuizId === q.id && (
+                    <tr>
+                      <td colSpan={6} className="bg-indigo-50">
+                        <div className="p-4">
+                          <h3 className="font-bold text-indigo-700 mb-2">
+                            Participants & Scores
+                          </h3>
+                          {loadingParticipants ? (
+                            <div className="text-gray-500">Loading...</div>
+                          ) : participants[q.id]?.length === 0 ? (
+                            <div className="text-gray-500">No results yet.</div>
+                          ) : (
+                            <table className="w-full text-left rounded">
+                              <thead>
+                                <tr>
+                                  <th className="py-1 px-2">Name</th>
+                                  <th className="py-1 px-2">Score</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {participants[q.id]?.map((p) => (
+                                  <tr key={p.user_id}>
+                                    <td className="py-1 px-2">{p.name}</td>
+                                    <td className="py-1 px-2 font-bold text-indigo-700">
+                                      {p.score}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
+          {visibleCount < quizzes.length && (
+            <div className="flex justify-center">
+              <button
+                onClick={handleShowMore}
+                className="px-6 py-2 bg-indigo-500 text-white rounded-full font-semibold shadow hover:bg-indigo-600 transition"
+                disabled={loadingMore}
+              >
+                {loadingMore ? "Loading..." : "Show More"}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
 }
+ 
 
 function QuizGame() {
   const [courses, setCourses] = useState([]);
@@ -329,15 +356,15 @@ function QuizGame() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200 px-2 sm:px-0 flex items-center justify-center">
-      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-10">
+      <div className="w-3/4 justify-center grid grid-cols-1 md:grid-cols-2 gap-10">
         {/* Left column: Previous group quizzes */}
-        <div>
+        <div className="g-white shadow-xl rounded-2xl p-6 flex flex-col gap-6 mt-2 ">
           <UserGroupQuizzes userId={hostId} token={token} />
         </div>
         {/* Right column: Host a Group Quiz */}
         <form
           onSubmit={handleHost}
-          className="bg-white shadow-xl rounded-2xl p-6 flex flex-col gap-6 mt-4 sm:mt-8 w-full"
+          className="bg-white shadow-xl rounded-2xl p-6 flex flex-col gap-6 mt-4 sm:mt-8 "
         >
           <h2 className="text-2xl font-extrabold text-indigo-700 mb-2 flex items-center gap-2">
             <span className="inline-block w-2 h-8 bg-indigo-400 rounded-full mr-2"></span>

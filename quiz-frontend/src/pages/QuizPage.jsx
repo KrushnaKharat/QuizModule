@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
+import Loader from "./Loader";
 
 function QuizPage() {
   const [topicTitle, setTopicTitle] = useState("");
@@ -238,7 +239,7 @@ function QuizPage() {
     setIsSubmitting(false);
   };
 
-  if (loading) return <div className="text-center p-10">Loading quiz...</div>;
+  if (loading) return <Loader text="Loading quiz..." />;
   if (error)
     return <div className="text-center p-10 text-red-500">{error}</div>;
 
