@@ -127,8 +127,11 @@ exports.getUserSessions = async (req, res) => {
   const { user_id } = req.params;
   try {
     const result = await pool.query(
-      `SELECT qs.* FROM quiz_sessions qs
+      `SELECT qs.*, c.title AS course_name, t.title AS topic_name
+       FROM quiz_sessions qs
        JOIN quiz_invitations qi ON qs.id = qi.session_id
+       JOIN courses c ON qs.course_id = c.id
+       JOIN topics t ON qs.topic_id = t.id
        WHERE qi.user_id = $1 AND qs.expires_at > NOW()`,
       [user_id]
     );
