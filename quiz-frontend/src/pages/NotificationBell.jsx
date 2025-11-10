@@ -100,7 +100,9 @@ function NotificationBell({ userId, token, onRespond }) {
                 <div>
                   <span className="font-semibold">{inv.host_name}</span> invited
                   you to join{" "}
-                  <span className="font-semibold">{inv.group_name}</span>
+                  <span className="font-semibold">
+                    {inv.group_name} of {inv.course_name}{" "}
+                  </span>
                 </div>
                 <div className="flex gap-2 mt-1">
                   <button

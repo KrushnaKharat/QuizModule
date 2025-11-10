@@ -47,7 +47,7 @@ function QuizPage() {
       .then((res) => {
         // Shuffle and select 10 questions
         const shuffled = res.data.sort(() => Math.random() - 0.5);
-        setQuestions(shuffled.slice(0, 10));
+        setQuestions(shuffled.slice(0, 20));
         setLoading(false);
       })
       .catch((err) => {
