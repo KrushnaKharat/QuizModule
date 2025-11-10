@@ -176,7 +176,6 @@ function QuizPage() {
       window.removeEventListener("popstate", handlePopState);
     };
   }, [showInstructions, submitted, isSubmitting]);
-
   const handleSubmit = async () => {
     if (submitted || isSubmitting || submitOnceRef.current) return; // Prevent double submit
     setIsSubmitting(true);
