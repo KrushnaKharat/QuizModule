@@ -91,11 +91,14 @@ function UserDashboard() {
       id: 12,
       src: "public/pictures/nlp.png",
     },
+    {
+      id: 15,
+      src: "public/pictures/internship.png",
+    },
   ];
 
   // Fetch all courses
   useEffect(() => {
-
     if (token) {
       setLoading(true);
       axios
@@ -227,6 +230,17 @@ function UserDashboard() {
   const isCourseUnlocked = (courseId) =>
     userCourses.some((c) => c.id === courseId);
 
+  // Show unlocked courses first (preserve secondary ordering)
+  const sortedCourses = React.useMemo(() => {
+    const unlockedSet = new Set(userCourses.map((c) => c.id));
+    return [...allCourses].sort((a, b) => {
+      const aLocked = unlockedSet.has(a.id) ? 0 : 1;
+      const bLocked = unlockedSet.has(b.id) ? 0 : 1;
+      if (aLocked !== bLocked) return aLocked - bLocked;
+      return String(a.title).localeCompare(String(b.title));
+    });
+  }, [allCourses, userCourses]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-white pl-2 pr-2 sm:pl-6 sm:pr-6">
       <div className="flex flex-col sm:flex-row items-center justify-between mb-8 border-b-4 border-purple-600 py-4 px-2 rounded-xl shadow gap-4 sm:gap-0">
@@ -305,163 +319,159 @@ function UserDashboard() {
       {error && <div className="text-red-600 mb-4">{error}</div>}
       {loading ? (
         <Loader text="Loading dashboard..." />
+      ) : !selectedCourse ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {sortedCourses.length === 0 ? (
+            <div className="text-gray-600">No courses found.</div>
+          ) : (
+            sortedCourses.map((course, index) => {
+              const unlocked = isCourseUnlocked(course.id);
+              return (
+                <div
+                  key={course.id}
+                  onClick={() => handleCourseClick(course, unlocked)}
+                  className={`group bg-white rounded-xl shadow-lg transition duration-300 p-6 cursor-pointer relative ${
+                    unlocked
+                      ? "hover:shadow-xl hover:scale-[1.03]"
+                      : "opacity-60 cursor-not-allowed "
+                  }`}
+                  style={{
+                    animation: "fadeInUp 0.7s ease forwards",
+                    animationDelay: `${index * 120}ms`,
+                    opacity: 0,
+                    pointerEvents: "auto",
+                  }}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-bold text-indigo-700">
+                      {course.title}
+                    </h2>
+                    {unlocked ? (
+                      <img
+                        src={(() => {
+                          const imgObj = courseImages.find(
+                            (img) => img.id === course.id
+                          );
+                          return imgObj
+                            ? `/${imgObj.src.replace(/^public\//, "")}`
+                            : "/pictures/image.png";
+                        })()}
+                        alt={course.title}
+                        className="h-16"
+                        srcSet=""
+                      />
+                    ) : (
+                      <span
+                        title="Locked"
+                        className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-gray-200 text-gray-500 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setLockedCourse(course);
+                          setShowLockPrompt(true);
+                        }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          strokeWidth={2}
+                          stroke="currentColor"
+                          className="w-6 h-6"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M16.5 10.5V7a4.5 4.5 0 00-9 0v3.5M5.25 10.5h13.5A2.25 2.25 0 0121 12.75v6A2.25 2.25 0 0118.75 21H5.25A2.25 2.25 0 013 18.75v-6A2.25 2.25 0 015.25 10.5z"
+                          />
+                        </svg>
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-4 text-sm text-indigo-600 font-medium underline transition opacity-100">
+                    {unlocked ? "View Topics →" : "Locked"}
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
       ) : (
-        !selectedCourse ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {allCourses.length === 0 ? (
-              <div className="text-gray-600">No courses found.</div>
-            ) : (
-              allCourses.map((course, index) => {
-                const unlocked = isCourseUnlocked(course.id);
+        <div>
+          <button
+            className="text-white bg-purple-700 hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
+            onClick={handleBackToCourses}
+          >
+            &larr; Back to Courses
+          </button>
+          <h2 className="text-2xl font-bold mb-6 text-indigo-700">
+            Topics in {selectedCourse.title}
+          </h2>
+          {topics.length === 0 ? (
+            <p className="text-gray-600">No topics found for this course.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {topics.map((topic) => {
+                const stats = topicStats[topic.id] || {};
                 return (
                   <div
-                    key={course.id}
-                    onClick={() => handleCourseClick(course, unlocked)}
-                    className={`group bg-white rounded-xl shadow-lg transition duration-300 p-6 cursor-pointer relative ${unlocked
-                        ? "hover:shadow-xl hover:scale-[1.03]"
-                        : "opacity-60 cursor-not-allowed"
-                      }`}
-                    style={{
-                      animation: "fadeInUp 0.7s ease forwards",
-                      animationDelay: `${index * 120}ms`,
-                      opacity: 0,
-                      pointerEvents: "auto",
-                    }}
+                    key={topic.id}
+                    className="cursor-pointer rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.03] transition transform p-6 bg-gradient-to-br from-blue-100 to-indigo-200"
                   >
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-xl font-bold text-indigo-700">
-                        {course.title}
-                      </h2>
-                      {unlocked ? (
-                        <img
-                          src={(() => {
-                            const imgObj = courseImages.find(
-                              (img) => img.id === course.id
-                            );
-                            return imgObj
-                              ? `/${imgObj.src.replace(/^public\//, "")}`
-                              : "/pictures/image.png";
-                          })()}
-                          alt={course.title}
-                          className="h-16"
-                          srcSet=""
-                        />
-                      ) : (
-                        <span
-                          title="Locked"
-                          className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-gray-200 text-gray-500 cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setLockedCourse(course);
-                            setShowLockPrompt(true);
-                          }}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={2}
-                            stroke="currentColor"
-                            className="w-6 h-6"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M16.5 10.5V7a4.5 4.5 0 00-9 0v3.5M5.25 10.5h13.5A2.25 2.25 0 0121 12.75v6A2.25 2.25 0 0118.75 21H5.25A2.25 2.25 0 013 18.75v-6A2.25 2.25 0 015.25 10.5z"
-                            />
-                          </svg>
+                    <div className="flex justify-between">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <h3 className="text-lg font-bold text-indigo-700">
+                            {topic.title}
+                          </h3>
+                        </div>
+                        <p className="text-sm text-gray-700">
+                          Start your quiz on this topic.
+                        </p>
+                      </div>
+                      <div className="flex flex-col gap-1 mt-2">
+                        <span className="text-indigo-700 flex text-sm font-semibold">
+                          Best Score:{" "}
+                          <p className="font-bold">
+                            {typeof stats.bestScore === "number"
+                              ? ` ${stats.bestScore}/10`
+                              : "—"}
+                          </p>
                         </span>
-                      )}
+                        <span className="text-orange-700 flex text-sm font-semibold">
+                          Remaining Attempts:{" "}
+                          <p className=" font-bold">
+                            {typeof stats.remaining === "number"
+                              ? `${stats.remaining}/${stats.maxAttempts || 3}`
+                              : "—"}
+                          </p>
+                        </span>
+                      </div>
                     </div>
-                    <div className="mt-4 text-sm text-indigo-600 font-medium underline transition opacity-100">
-                      {unlocked ? "View Topics →" : "Locked"}
+                    <div className="flex justify-between mt-8 ">
+                      <button
+                        className="text-white bg-blue-500 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900"
+                        onClick={() =>
+                          (window.location.href = `/practicequiz/${topic.id}`)
+                        }
+                      >
+                        Start Practice Quiz
+                      </button>
+                      <button
+                        className="text-white bg-indigo-500 hover:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900"
+                        onClick={() =>
+                          (window.location.href = `/quiz/${topic.id}`)
+                        }
+                      >
+                        Start Quiz →
+                      </button>
                     </div>
                   </div>
                 );
-              })
-            )}
-          </div>
-        ) : (
-          <div>
-            <button
-              className="text-white bg-purple-700 hover:bg-purple-800 focus:outline-none focus:ring-4 focus:ring-purple-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
-              onClick={handleBackToCourses}
-            >
-              &larr; Back to Courses
-            </button>
-            <h2 className="text-2xl font-bold mb-6 text-indigo-700">
-              Topics in {selectedCourse.title}
-            </h2>
-            {topics.length === 0 ? (
-              <p className="text-gray-600">No topics found for this course.</p>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {topics.map((topic) => {
-                  const stats = topicStats[topic.id] || {};
-                  return (
-                    <div
-                      key={topic.id}
-                      className="cursor-pointer rounded-xl shadow-lg hover:shadow-xl hover:scale-[1.03] transition transform p-6 bg-gradient-to-br from-blue-100 to-indigo-200"
-                    >
-                      <div className="flex justify-between">
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-lg font-bold text-indigo-700">
-                              {topic.title}
-                            </h3>
-                          </div>
-                          <p className="text-sm text-gray-700">
-                            Start your quiz on this topic.
-                          </p>
-                        </div>
-                        <div className="flex flex-col gap-1 mt-2">
-                          <span className="text-indigo-700 flex text-sm font-semibold">
-                            Best Score:{" "}
-                            <p className="font-bold">
-                              {typeof stats.bestScore === "number"
-                                ? ` ${stats.bestScore}/10`
-                                : "—"}
-                            </p>
-                          </span>
-                          <span className="text-orange-700 flex text-sm font-semibold">
-                            Remaining Attempts:{" "}
-                            <p className=" font-bold">
-                              {typeof stats.remaining === "number"
-                                ? `${stats.remaining}/${stats.maxAttempts || 3}`
-                                : "—"}
-                            </p>
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex justify-between mt-8 ">
-                        <button
-                          className="text-white bg-blue-500 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900"
-                          onClick={() =>
-                            (window.location.href = `/practicequiz/${topic.id}`)
-                          }
-                        >
-                          Start Practice Quiz
-                        </button>
-                        <button
-                          className="text-white bg-indigo-500 hover:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900"
-                          onClick={() =>
-                            (window.location.href = `/quiz/${topic.id}`)
-                          }
-                        >
-                          Start Quiz →
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )
-
-      )
-      }
-
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {showLockPrompt && lockedCourse && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">

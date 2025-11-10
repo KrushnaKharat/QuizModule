@@ -17,12 +17,12 @@ function Login() {
   const navigate = useNavigate();
 
   const validateEmail = (email) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-};
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  };
 
-const validateMobile = (mobile) => {
-  return /^\d{10}$/.test(mobile);
-};
+  const validateMobile = (mobile) => {
+    return /^\d{10}$/.test(mobile);
+  };
 
   // Autofill email after signup
   useEffect(() => {
@@ -36,62 +36,59 @@ const validateMobile = (mobile) => {
   }, [isSignup]);
 
   const handleLogin = async () => {
-  setErrorMsg("");
-  if (!validateEmail(email)) {
-    setErrorMsg("Please enter a valid email address.");
-    return;
-  }
-  try {
-    const res = await axios.post(
-      "https://quizmodule.onrender.com/api/auth/login",
-      {
-        email,
-        password,
-      }
-    );
-    localStorage.setItem("token", res.data.token);
-    localStorage.setItem("role", res.data.role);
-    localStorage.setItem("user", JSON.stringify(res.data.user));
-    navigate(res.data.role === "admin" ? "/admin" : "/dashboard");
-  } catch (err) {
-    setErrorMsg("Invalid email or password");
-  }
-};
+    setErrorMsg("");
+
+    try {
+      const res = await axios.post(
+        "https://quizmodule.onrender.com/api/auth/login",
+        {
+          email,
+          password,
+        }
+      );
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.role);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      navigate(res.data.role === "admin" ? "/admin" : "/dashboard");
+    } catch (err) {
+      setErrorMsg("Invalid email or password");
+    }
+  };
 
   const handleSignup = async () => {
-  setSignupError("");
-  setSignupSuccess("");
-  if (!validateEmail(signupEmail)) {
-    setSignupError("Please enter a valid email address.");
-    return;
-  }
-  if (!validateMobile(signupMobile)) {
-    setSignupError("Mobile number must be exactly 10 digits.");
-    return;
-  }
-  try {
-    await axios.post("https://quizmodule.onrender.com/api/auth/register", {
-      name: signupName,
-      email: signupEmail,
-      password: signupPassword,
-      mobile: signupMobile,
-      role: "user",
-      courses: [2],
-    });
-    setSignupSuccess("🎉 Registration successful! You can now log in.");
-    localStorage.setItem("lastSignupEmail", signupEmail);
-    setIsSignup(false);
-    setSignupName("");
-    setSignupEmail("");
-    setSignupMobile("");
-    setSignupPassword("");
-  } catch (err) {
-    setSignupError(
-      err.response?.data?.msg ||
-        "Registration failed. Email may already be in use."
-    );
-  }
-};
+    setSignupError("");
+    setSignupSuccess("");
+    if (!validateEmail(signupEmail)) {
+      setSignupError("Please enter a valid email address.");
+      return;
+    }
+    if (!validateMobile(signupMobile)) {
+      setSignupError("Mobile number must be exactly 10 digits.");
+      return;
+    }
+    try {
+      await axios.post("https://quizmodule.onrender.com/api/auth/register", {
+        name: signupName,
+        email: signupEmail,
+        password: signupPassword,
+        mobile: signupMobile,
+        role: "user",
+        courses: [2, 15],
+      });
+      setSignupSuccess("🎉 Registration successful! You can now log in.");
+      localStorage.setItem("lastSignupEmail", signupEmail);
+      setIsSignup(false);
+      setSignupName("");
+      setSignupEmail("");
+      setSignupMobile("");
+      setSignupPassword("");
+    } catch (err) {
+      setSignupError(
+        err.response?.data?.msg ||
+          "Registration failed. Email may already be in use."
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-400 via-blue-200 to-purple-200">
@@ -203,7 +200,8 @@ const validateMobile = (mobile) => {
                     d="M5 13l4 4L19 7"
                   />
                 </svg>
-                Default Course: <span className="font-bold">Python</span>
+                Default Course:{" "}
+                <span className="font-bold">Python + Internship Test</span>
               </div>
               {signupError && (
                 <div className="text-red-600 text-sm mb-4">{signupError}</div>
